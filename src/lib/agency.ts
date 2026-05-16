@@ -45,7 +45,7 @@ export const getAgencyByHost = async (
     }
 
     // In dev environment or if matched nothing, default to "demo" agency
-    if (hostname === "localhost" || hostname.includes("run.app")) {
+    if (hostname === "localhost" || hostname.includes("run.app") || hostname.includes("github.io")) {
       const demoDoc = await getDoc(doc(db, "agencies", "demo"));
       
       const rjProperties = [
