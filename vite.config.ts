@@ -11,7 +11,7 @@ export default defineConfig(({mode}) => {
     plugins: [
       react(),
       tailwindcss(),
-      VitePWA({
+      process.env.NODE_ENV === 'development' && VitePWA({
         registerType: 'autoUpdate',
         devOptions: { enabled: true },
         manifest: {
@@ -23,7 +23,7 @@ export default defineConfig(({mode}) => {
           display: 'standalone',
         }
       })
-    ],
+    ].filter(Boolean),
     define: {
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
     },
