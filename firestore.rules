@@ -1,0 +1,69 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global lock
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() { return request.auth != null && request.auth.token.email_verified == true; }
+    function getUserProfile() { return get(/databases/$(database)/documents/users/$(request.auth.uid)).data; }
+    function isUserAgency(agencyId) { return getUserProfile().agencyId == agencyId; }
+    function hasRole(agencyId, role) { return isUserAgency(agencyId) && getUserProfile().role == role; }
+    function isAgencyAdmin(agencyId) { return hasRole(agencyId, 'ADMIN'); }
+    function isAgencyMember(agencyId) { return isUserAgency(agencyId); }
+    
+    // Agencies
+    match /agencies/{agencyId} {
+      // Anyone can read agency data (needed to load the site via domain)
+      allow read: if true;
+      allow write: if agencyId == 'demo';
+      allow create: if isSignedIn() && request.resource.data.keys().hasAll(['name', 'subdomain', 'createdAt', 'ownerId']) && request.resource.data.ownerId == request.auth.uid;
+      allow update: if isAgencyAdmin(agencyId) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'customDomain', 'plan']);
+    }
+
+    // Users
+    match /users/{userId} {
+      // Users can read their own profile
+      allow read: if isSignedIn() && request.auth.uid == userId;
+      // Admins can read users in their agency
+      allow read, list: if isSignedIn() && isAgencyAdmin(resource.data.agencyId);
+      // Create is handled via Cloud Functions/Admin SDK normally, but allowing self-registration for now
+      allow create: if isSignedIn() && request.auth.uid == userId && request.resource.data.keys().hasAll(['email', 'role', 'agencyId', 'createdAt']) && request.resource.data.role == 'ADMIN'; // First user is admin
+      allow update: if isSignedIn() && isAgencyAdmin(resource.data.agencyId) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['role', 'name']);
+    }
+
+    // Properties
+    match /agencies/{agencyId}/properties/{propertyId} {
+      // Public read for properties of the agency
+      allow read: if true;
+      allow write: if agencyId == 'demo';
+      allow create: if isAgencyMember(agencyId) && request.resource.data.keys().hasAll(['title', 'price', 'type', 'status', 'city', 'bedrooms', 'bathrooms', 'area', 'createdAt']);
+      allow update: if isAgencyMember(agencyId) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'description', 'price', 'type', 'status', 'city', 'neighborhood', 'bedrooms', 'bathrooms', 'area', 'imageUrl', 'views', 'updatedAt']);
+      allow delete: if isAgencyAdmin(agencyId);
+    }
+
+    // Leads
+    match /agencies/{agencyId}/leads/{leadId} {
+      // Create from public site without auth
+      allow create: if request.resource.data.keys().hasAll(['name', 'status', 'createdAt']);
+      // Read, update, delete only by agency members
+      allow read, list: if isAgencyMember(agencyId) || agencyId == 'demo';
+      allow write: if isAgencyMember(agencyId) || agencyId == 'demo';
+      
+      // Interactions
+      match /interactions/{interactionId} {
+        allow read, list, write: if isAgencyMember(agencyId) || agencyId == 'demo';
+      }
+    }
+
+    // Analytics
+    match /agencies/{agencyId}/analytics/{hitId} {
+      allow create: if request.resource.data.keys().hasAll(['path', 'timestamp']);
+      allow read, list: if isAgencyAdmin(agencyId);
+    }
+  }
+}

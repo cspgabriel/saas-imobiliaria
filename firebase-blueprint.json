@@ -1,0 +1,119 @@
+{
+  "entities": {
+    "agency": {
+      "title": "Agency",
+      "description": "A real estate agency (tenant) in the SaaS platform.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "subdomain": { "type": "string" },
+        "customDomain": { "type": "string" },
+        "plan": { "type": "string", "enum": ["free", "pro", "enterprise"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "ownerId": { "type": "string" }
+      },
+      "required": ["name", "subdomain", "createdAt", "ownerId"]
+    },
+    "userProfile": {
+      "title": "User Profile",
+      "description": "User account linked to an agency.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["ADMIN", "MANAGER", "BROKER"] },
+        "agencyId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "role", "agencyId", "createdAt"]
+    },
+    "property": {
+      "title": "Property",
+      "description": "A real estate property listing belonging to an agency.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "price": { "type": "number" },
+        "type": { "type": "string", "enum": ["VENDA", "LOCACAO"] },
+        "status": { "type": "string", "enum": ["DISPONIVEL", "RESERVADO", "VENDIDO"] },
+        "city": { "type": "string" },
+        "neighborhood": { "type": "string" },
+        "bedrooms": { "type": "number" },
+        "bathrooms": { "type": "number" },
+        "area": { "type": "number" },
+        "imageUrl": { "type": "string" },
+        "views": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "price", "type", "status", "city", "bedrooms", "bathrooms", "area", "createdAt"]
+    },
+    "lead": {
+      "title": "Lead",
+      "description": "A potential customer interested in properties.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "status": { "type": "string", "enum": ["NOVO", "CONTATO", "VISITA", "PROPOSTA", "GANHO", "PERDIDO"] },
+        "propertyId": { "type": "string" },
+        "propertyTitle": { "type": "string" },
+        "assignedTo": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "status", "createdAt"]
+    },
+    "interaction": {
+      "title": "Interaction",
+      "description": "A logged interaction with a lead (email, whatsapp, note).",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["WHATSAPP", "EMAIL", "NOTE"] },
+        "content": { "type": "string" },
+        "performedBy": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["type", "content", "performedBy", "createdAt"]
+    },
+    "pageHit": {
+      "title": "Page Hit",
+      "description": "Analytics tracking for page views.",
+      "type": "object",
+      "properties": {
+        "path": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "propertyId": { "type": "string" }
+      },
+      "required": ["path", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/agencies/{agencyId}": {
+      "schema": "agency",
+      "description": "Stores tenant data."
+    },
+    "/users/{userId}": {
+      "schema": "userProfile",
+      "description": "Global users collection linking a user to an agency."
+    },
+    "/agencies/{agencyId}/properties/{propertyId}": {
+      "schema": "property",
+      "description": "Properties belonging to a specific agency."
+    },
+    "/agencies/{agencyId}/leads/{leadId}": {
+      "schema": "lead",
+      "description": "Leads generated for a specific agency."
+    },
+    "/agencies/{agencyId}/leads/{leadId}/interactions/{interactionId}": {
+      "schema": "interaction",
+      "description": "Interaction history for a lead."
+    },
+    "/agencies/{agencyId}/analytics/{hitId}": {
+      "schema": "pageHit",
+      "description": "Analytics data for the agency."
+    }
+  }
+}

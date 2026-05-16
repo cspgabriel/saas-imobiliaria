@@ -1,0 +1,8 @@
+{
+  "name": "PropTech SaaS - Gestão Imobiliária",
+  "description": "Sistema completo de Gestão Imobiliária com Site Público, Dashboard ERP e CRM de Leads.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
