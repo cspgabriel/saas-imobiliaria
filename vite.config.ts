@@ -7,7 +7,7 @@ import {defineConfig, loadEnv} from 'vite';
 export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
   return {
-    base: process.env.NODE_ENV === 'production' ? '/saas-imobiliaria/' : '/',
+    base: process.env.GITHUB_ACTIONS ? '/saas-imobiliaria/' : '/',
     plugins: [
       react(),
       tailwindcss(),
