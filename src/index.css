@@ -1,10 +1,10 @@
-@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Josefin+Sans:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap");
 @import "tailwindcss";
 
 :root {
-  color: #134e4a;
-  background: #f0fdfa;
-  font-family: "Josefin Sans", system-ui, sans-serif;
+  color: #0f2447;
+  background: #f0f4ff;
+  font-family: "Inter", system-ui, sans-serif;
 }
 
 html {
@@ -14,9 +14,9 @@ html {
 body {
   margin: 0;
   min-width: 320px;
-  background: #f0fdfa;
-  color: #134e4a;
-  font-family: "Josefin Sans", system-ui, sans-serif;
+  background: #f0f4ff;
+  color: #0f2447;
+  font-family: "Inter", system-ui, sans-serif;
 }
 
 button,
@@ -33,7 +33,7 @@ a {
 }
 
 .font-display {
-  font-family: "Cinzel", Georgia, serif;
+  font-family: "Playfair Display", Georgia, serif;
 }
 
 .focus-ring {
@@ -41,7 +41,7 @@ a {
 }
 
 .focus-ring:focus-visible {
-  outline: 3px solid rgba(20, 184, 166, 0.35);
+  outline: 3px solid rgba(37, 99, 235, 0.35);
   outline-offset: 2px;
 }
 

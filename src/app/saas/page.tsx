@@ -75,28 +75,28 @@ const plans = [
 
 export function SaasLanding() {
   return (
-    <div className="min-h-screen bg-[#f0fdfa] text-[#134e4a]">
-      <a href="#conteudo" className="focus-ring sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[80] focus:bg-white focus:px-4 focus:py-3 focus:text-[#134e4a] focus:shadow-lg">
+    <div className="min-h-screen bg-[#f0f4ff] text-[#0f2447]">
+      <a href="#conteudo" className="focus-ring sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[80] focus:bg-white focus:px-4 focus:py-3 focus:text-[#0f2447] focus:shadow-lg">
         Ir para conteudo
       </a>
 
-      <nav className="fixed left-0 right-0 top-0 z-50 border-b border-[#99f6e4]/60 bg-white/90 backdrop-blur">
+      <nav className="fixed left-0 right-0 top-0 z-50 border-b border-[#bfdbfe]/60 bg-white/90 backdrop-blur">
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6">
           <Link href="/saas" className="focus-ring flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#0f766e] text-white shadow-sm">
+            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#1d4ed8] text-white shadow-sm">
               <Building2 className="h-5 w-5" />
             </span>
-            <span className="font-display text-xl font-bold text-[#134e4a]">Imobi SaaS</span>
+            <span className="font-display text-xl font-bold text-[#0f2447]">Imobi SaaS</span>
           </Link>
 
-          <div className="hidden items-center gap-7 text-sm font-semibold text-[#134e4a]/75 md:flex">
-            <a className="focus-ring hover:text-[#0f766e]" href="#produto">Produto</a>
-            <a className="focus-ring hover:text-[#0f766e]" href="#recursos">Recursos</a>
-            <a className="focus-ring hover:text-[#0f766e]" href="#planos">Planos</a>
+          <div className="hidden items-center gap-7 text-sm font-semibold text-[#0f2447]/75 md:flex">
+            <a className="focus-ring hover:text-[#1d4ed8]" href="#produto">Produto</a>
+            <a className="focus-ring hover:text-[#1d4ed8]" href="#recursos">Recursos</a>
+            <a className="focus-ring hover:text-[#1d4ed8]" href="#planos">Planos</a>
           </div>
 
           <div className="flex items-center gap-2">
-            <Link href="/" className="focus-ring hidden rounded-lg px-4 py-3 text-sm font-bold text-[#134e4a] hover:bg-[#ccfbf1] sm:inline-flex">
+            <Link href="/" className="focus-ring hidden rounded-lg px-4 py-3 text-sm font-bold text-[#0f2447] hover:bg-[#dbeafe] sm:inline-flex">
               Ver demo
             </Link>
             <Link href="/admin" className="focus-ring inline-flex items-center gap-2 rounded-lg bg-[#0369a1] px-4 py-3 text-sm font-bold text-white shadow-sm hover:bg-[#075985]">
@@ -108,13 +108,13 @@ export function SaasLanding() {
       </nav>
 
       <main id="conteudo" className="pt-20">
-        <section className="relative overflow-hidden bg-[#0f766e] text-white">
+        <section className="relative overflow-hidden bg-[#1d4ed8] text-white">
           <img
             src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1800&q=80"
             alt="Sala moderna em imovel de alto padrao"
             className="absolute inset-0 h-full w-full object-cover opacity-30"
           />
-          <div className="absolute inset-0 bg-[#0f766e]/80" />
+          <div className="absolute inset-0 bg-[#1d4ed8]/80" />
           <div className="relative mx-auto grid min-h-[calc(100vh-80px)] max-w-7xl items-center gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1fr_0.9fr]">
             <div className="max-w-3xl">
               <div className="mb-6 inline-flex items-center gap-2 rounded-lg border border-white/25 bg-white/10 px-3 py-2 text-sm font-bold">
@@ -128,7 +128,7 @@ export function SaasLanding() {
                 Landing, site de imobiliaria, CRM, relatorios e marketing IA em uma unica operacao para captar, atender e converter leads de imoveis.
               </p>
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-                <Link href="/admin" className="focus-ring inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-4 text-base font-bold text-[#134e4a] shadow-sm hover:bg-[#ccfbf1]">
+                <Link href="/admin" className="focus-ring inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-4 text-base font-bold text-[#0f2447] shadow-sm hover:bg-[#dbeafe]">
                   Entrar no sistema
                   <ArrowRight className="h-5 w-5" />
                 </Link>
@@ -137,7 +137,7 @@ export function SaasLanding() {
                   <PanelTop className="h-5 w-5" />
                 </Link>
               </div>
-              <div className="mt-10 grid max-w-2xl grid-cols-3 gap-4 border-t border-white/20 pt-6 text-sm text-[#ccfbf1]">
+              <div className="mt-10 grid max-w-2xl grid-cols-3 gap-4 border-t border-white/20 pt-6 text-sm text-[#dbeafe]">
                 <div>
                   <strong className="block text-2xl text-white">5 min</strong>
                   para publicar
@@ -153,20 +153,20 @@ export function SaasLanding() {
               </div>
             </div>
 
-            <div id="produto" className="w-full rounded-lg border border-white/20 bg-white p-3 text-[#134e4a] shadow-2xl">
-              <div className="overflow-hidden rounded-lg border border-[#99f6e4] bg-[#f8fafc]">
-                <div className="flex items-center justify-between border-b border-[#ccfbf1] bg-white px-4 py-3">
+            <div id="produto" className="w-full rounded-lg border border-white/20 bg-white p-3 text-[#0f2447] shadow-2xl">
+              <div className="overflow-hidden rounded-lg border border-[#bfdbfe] bg-[#f8fafc]">
+                <div className="flex items-center justify-between border-b border-[#dbeafe] bg-white px-4 py-3">
                   <div className="flex items-center gap-2">
-                    <span className="h-3 w-3 rounded-full bg-[#14b8a6]" />
+                    <span className="h-3 w-3 rounded-full bg-[#2563eb]" />
                     <span className="h-3 w-3 rounded-full bg-[#0369a1]" />
                     <span className="h-3 w-3 rounded-full bg-[#f59e0b]" />
                   </div>
-                  <span className="text-xs font-bold text-[#0f766e]">Painel Imobiliaria Pro</span>
+                  <span className="text-xs font-bold text-[#1d4ed8]">Painel Imobiliaria Pro</span>
                 </div>
                 <div className="grid gap-3 p-4 sm:grid-cols-[0.7fr_1fr]">
                   <div className="space-y-3">
                     {["Dashboard", "Imoveis", "CRM", "Marketing"].map((item, index) => (
-                      <div key={item} className={`rounded-lg border px-3 py-3 text-sm font-bold ${index === 1 ? "border-[#14b8a6] bg-[#ccfbf1] text-[#0f766e]" : "border-[#e2e8f0] bg-white text-[#475569]"}`}>
+                      <div key={item} className={`rounded-lg border px-3 py-3 text-sm font-bold ${index === 1 ? "border-[#2563eb] bg-[#dbeafe] text-[#1d4ed8]" : "border-[#e2e8f0] bg-white text-[#475569]"}`}>
                         {item}
                       </div>
                     ))}
@@ -176,7 +176,7 @@ export function SaasLanding() {
                       {["184 leads", "42 visitas", "18 propostas"].map((item) => (
                         <div key={item} className="rounded-lg border border-[#e2e8f0] bg-white p-3">
                           <span className="text-xs font-semibold text-[#64748b]">Hoje</span>
-                          <strong className="mt-1 block text-lg text-[#134e4a]">{item}</strong>
+                          <strong className="mt-1 block text-lg text-[#0f2447]">{item}</strong>
                         </div>
                       ))}
                     </div>
@@ -204,7 +204,7 @@ export function SaasLanding() {
         <section id="recursos" className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
           <div className="mb-10 max-w-3xl">
             <p className="text-sm font-bold text-[#0369a1]">Produto completo</p>
-            <h2 className="font-display mt-3 text-4xl font-bold text-[#134e4a]">Tudo que uma imobiliaria precisa para operar online</h2>
+            <h2 className="font-display mt-3 text-4xl font-bold text-[#0f2447]">Tudo que uma imobiliaria precisa para operar online</h2>
             <p className="mt-4 text-lg leading-8 text-[#475569]">
               O layout foi pensado para leitura rapida, operacao diaria e conversao: menos enfeite, mais contexto comercial.
             </p>
@@ -212,18 +212,18 @@ export function SaasLanding() {
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {features.map((feature) => (
-              <div key={feature.title} className="rounded-lg border border-[#99f6e4] bg-white p-6 shadow-sm transition-colors duration-200 hover:border-[#14b8a6]">
-                <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-lg bg-[#ccfbf1] text-[#0f766e]">
+              <div key={feature.title} className="rounded-lg border border-[#bfdbfe] bg-white p-6 shadow-sm transition-colors duration-200 hover:border-[#2563eb]">
+                <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-lg bg-[#dbeafe] text-[#1d4ed8]">
                   <feature.icon className="h-5 w-5" />
                 </div>
-                <h3 className="text-xl font-bold text-[#134e4a]">{feature.title}</h3>
+                <h3 className="text-xl font-bold text-[#0f2447]">{feature.title}</h3>
                 <p className="mt-3 leading-7 text-[#475569]">{feature.desc}</p>
               </div>
             ))}
           </div>
         </section>
 
-        <section className="border-y border-[#99f6e4] bg-white">
+        <section className="border-y border-[#bfdbfe] bg-white">
           <div className="mx-auto grid max-w-7xl gap-8 px-4 py-16 sm:px-6 lg:grid-cols-3">
             {[
               ["Landing SaaS", "Explica a oferta e leva para teste ou demo."],
@@ -231,9 +231,9 @@ export function SaasLanding() {
               ["Sistema interno", "Centraliza imoveis, leads, relatorios e anuncios."],
             ].map(([title, desc]) => (
               <div key={title} className="flex gap-4">
-                <CheckCircle2 className="mt-1 h-6 w-6 shrink-0 text-[#0f766e]" />
+                <CheckCircle2 className="mt-1 h-6 w-6 shrink-0 text-[#1d4ed8]" />
                 <div>
-                  <h3 className="text-lg font-bold text-[#134e4a]">{title}</h3>
+                  <h3 className="text-lg font-bold text-[#0f2447]">{title}</h3>
                   <p className="mt-2 text-[#475569]">{desc}</p>
                 </div>
               </div>
@@ -245,32 +245,32 @@ export function SaasLanding() {
           <div className="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
               <p className="text-sm font-bold text-[#0369a1]">Planos</p>
-              <h2 className="font-display mt-3 text-4xl font-bold text-[#134e4a]">Preco simples para vender melhor</h2>
+              <h2 className="font-display mt-3 text-4xl font-bold text-[#0f2447]">Preco simples para vender melhor</h2>
             </div>
             <p className="max-w-xl text-[#475569]">Comece pequeno, mantenha a base organizada e evolua para equipe, filial e automacoes.</p>
           </div>
 
           <div className="grid gap-4 lg:grid-cols-3">
             {plans.map((plan) => (
-              <div key={plan.name} className={`rounded-lg border bg-white p-6 shadow-sm ${plan.featured ? "border-[#0369a1]" : "border-[#99f6e4]"}`}>
+              <div key={plan.name} className={`rounded-lg border bg-white p-6 shadow-sm ${plan.featured ? "border-[#0369a1]" : "border-[#bfdbfe]"}`}>
                 {plan.featured && (
                   <div className="mb-4 inline-flex rounded-lg bg-[#0369a1] px-3 py-2 text-xs font-bold text-white">Mais usado</div>
                 )}
-                <h3 className="text-2xl font-bold text-[#134e4a]">{plan.name}</h3>
+                <h3 className="text-2xl font-bold text-[#0f2447]">{plan.name}</h3>
                 <p className="mt-2 min-h-12 text-[#475569]">{plan.desc}</p>
                 <div className="my-6">
-                  <span className="text-4xl font-bold text-[#134e4a]">{plan.price}</span>
+                  <span className="text-4xl font-bold text-[#0f2447]">{plan.price}</span>
                   <span className="text-[#64748b]">/mes</span>
                 </div>
                 <ul className="space-y-3">
                   {plan.items.map((item) => (
                     <li key={item} className="flex items-center gap-3 text-[#475569]">
-                      <CheckCircle2 className="h-5 w-5 shrink-0 text-[#0f766e]" />
+                      <CheckCircle2 className="h-5 w-5 shrink-0 text-[#1d4ed8]" />
                       {item}
                     </li>
                   ))}
                 </ul>
-                <Link href="/admin" className={`focus-ring mt-8 inline-flex w-full items-center justify-center rounded-lg px-5 py-4 font-bold ${plan.featured ? "bg-[#0369a1] text-white hover:bg-[#075985]" : "border border-[#99f6e4] text-[#134e4a] hover:bg-[#ccfbf1]"}`}>
+                <Link href="/admin" className={`focus-ring mt-8 inline-flex w-full items-center justify-center rounded-lg px-5 py-4 font-bold ${plan.featured ? "bg-[#0369a1] text-white hover:bg-[#075985]" : "border border-[#bfdbfe] text-[#0f2447] hover:bg-[#dbeafe]"}`}>
                   {plan.cta}
                 </Link>
               </div>
@@ -279,10 +279,10 @@ export function SaasLanding() {
         </section>
       </main>
 
-      <footer className="border-t border-[#99f6e4] bg-[#134e4a] px-4 py-10 text-white sm:px-6">
+      <footer className="border-t border-[#bfdbfe] bg-[#0f2447] px-4 py-10 text-white sm:px-6">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 text-sm font-semibold md:flex-row md:items-center md:justify-between">
           <span>Imobi SaaS - plataforma imobiliaria multi-tenant</span>
-          <div className="flex gap-4 text-[#ccfbf1]">
+          <div className="flex gap-4 text-[#dbeafe]">
             <Link href="/">Site modelo</Link>
             <Link href="/admin">Sistema</Link>
           </div>

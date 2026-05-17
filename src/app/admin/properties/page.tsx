@@ -149,7 +149,7 @@ export function AdminProperties() {
     });
   }, [properties, searchTerm, statusFilter]);
 
-  if (agencyLoading) return <div className="p-6 text-lg font-bold text-[#0f766e]">Carregando...</div>;
+  if (agencyLoading) return <div className="p-6 text-lg font-bold text-[#1d4ed8]">Carregando...</div>;
 
   const statusClass: Record<string, string> = {
     DISPONIVEL: "bg-[#dcfce7] text-[#15803d]",
@@ -159,11 +159,11 @@ export function AdminProperties() {
 
   return (
     <div className="mx-auto max-w-7xl p-4 pb-28 sm:p-6 lg:p-8">
-      <section className="mb-6 rounded-lg border border-[#99f6e4] bg-white p-6 shadow-sm">
+      <section className="mb-6 rounded-lg border border-[#bfdbfe] bg-white p-6 shadow-sm">
         <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
           <div>
             <p className="text-sm font-bold text-[#0369a1]">Carteira</p>
-            <h1 className="font-display mt-2 text-4xl font-bold text-[#134e4a]">Imoveis</h1>
+            <h1 className="font-display mt-2 text-4xl font-bold text-[#0f2447]">Imoveis</h1>
             <p className="mt-3 max-w-3xl text-[#475569]">Cadastre, revise e publique oportunidades da {agency?.name}.</p>
           </div>
           <button
@@ -179,14 +179,14 @@ export function AdminProperties() {
         </div>
       </section>
 
-      <section className="mb-5 grid gap-3 rounded-lg border border-[#99f6e4] bg-white p-4 shadow-sm md:grid-cols-[1fr_220px]">
+      <section className="mb-5 grid gap-3 rounded-lg border border-[#bfdbfe] bg-white p-4 shadow-sm md:grid-cols-[1fr_220px]">
         <label className="relative block">
           <span className="sr-only">Buscar imoveis</span>
           <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#64748b]" />
           <input
             type="search"
             placeholder="Buscar por titulo, cidade ou bairro"
-            className="focus-ring w-full rounded-lg border border-[#ccfbf1] bg-[#f8fafc] py-4 pl-12 pr-4 text-[#134e4a] placeholder:text-[#64748b]"
+            className="focus-ring w-full rounded-lg border border-[#dbeafe] bg-[#f8fafc] py-4 pl-12 pr-4 text-[#0f2447] placeholder:text-[#64748b]"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -194,7 +194,7 @@ export function AdminProperties() {
         <label className="block">
           <span className="sr-only">Filtrar por status</span>
           <select
-            className="focus-ring w-full rounded-lg border border-[#ccfbf1] bg-[#f8fafc] px-4 py-4 font-bold text-[#134e4a]"
+            className="focus-ring w-full rounded-lg border border-[#dbeafe] bg-[#f8fafc] px-4 py-4 font-bold text-[#0f2447]"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
@@ -206,11 +206,11 @@ export function AdminProperties() {
         </label>
       </section>
 
-      <section className="overflow-hidden rounded-lg border border-[#99f6e4] bg-white shadow-sm">
+      <section className="overflow-hidden rounded-lg border border-[#bfdbfe] bg-white shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[880px] border-collapse text-left">
             <thead>
-              <tr className="border-b border-[#ccfbf1] bg-[#f0fdfa] text-sm font-bold text-[#475569]">
+              <tr className="border-b border-[#dbeafe] bg-[#f0f4ff] text-sm font-bold text-[#475569]">
                 <th className="p-4">Imovel</th>
                 <th className="p-4">Tipo</th>
                 <th className="p-4">Localizacao</th>
@@ -219,22 +219,22 @@ export function AdminProperties() {
                 <th className="p-4 text-right">Acoes</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#ccfbf1]">
+            <tbody className="divide-y divide-[#dbeafe]">
               {filteredProperties.map((prop) => (
                 <tr key={prop.id} className="transition-colors duration-200 hover:bg-[#f8fafc]">
                   <td className="p-4">
-                    <div className="font-bold text-[#134e4a]">{prop.title}</div>
+                    <div className="font-bold text-[#0f2447]">{prop.title}</div>
                     <div className="mt-1 font-mono text-xs text-[#64748b]">{prop.id.substring(0, 8)}...</div>
                   </td>
                   <td className="p-4">
-                    <span className="rounded-lg bg-[#ccfbf1] px-3 py-2 text-xs font-bold text-[#0f766e]">{prop.type}</span>
+                    <span className="rounded-lg bg-[#dbeafe] px-3 py-2 text-xs font-bold text-[#1d4ed8]">{prop.type}</span>
                   </td>
                   <td className="p-4 text-sm font-semibold text-[#475569]">
                     {prop.city}
                     <br />
                     <span className="text-[#64748b]">{prop.neighborhood}</span>
                   </td>
-                  <td className="p-4 font-bold text-[#134e4a]">
+                  <td className="p-4 font-bold text-[#0f2447]">
                     {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(prop.price)}
                   </td>
                   <td className="p-4">
@@ -244,10 +244,10 @@ export function AdminProperties() {
                   </td>
                   <td className="p-4">
                     <div className="flex items-center justify-end gap-2">
-                      <a href={`/imovel/${prop.id}`} target="_blank" rel="noopener noreferrer" className="focus-ring rounded-lg p-2 text-[#64748b] hover:bg-[#ccfbf1] hover:text-[#0f766e]" title="Ver no site" aria-label="Ver no site">
+                      <a href={`/imovel/${prop.id}`} target="_blank" rel="noopener noreferrer" className="focus-ring rounded-lg p-2 text-[#64748b] hover:bg-[#dbeafe] hover:text-[#1d4ed8]" title="Ver no site" aria-label="Ver no site">
                         <LinkIcon className="h-5 w-5" />
                       </a>
-                      <button onClick={() => handleEditClick(prop)} className="focus-ring rounded-lg p-2 text-[#64748b] hover:bg-[#ccfbf1] hover:text-[#0f766e]" title="Editar" aria-label="Editar">
+                      <button onClick={() => handleEditClick(prop)} className="focus-ring rounded-lg p-2 text-[#64748b] hover:bg-[#dbeafe] hover:text-[#1d4ed8]" title="Editar" aria-label="Editar">
                         <Edit className="h-5 w-5" />
                       </button>
                       <button onClick={() => handleDelete(prop.id)} className="focus-ring rounded-lg p-2 text-[#64748b] hover:bg-[#fee2e2] hover:text-[#dc2626]" title="Excluir" aria-label="Excluir">
@@ -260,7 +260,7 @@ export function AdminProperties() {
               {filteredProperties.length === 0 && (
                 <tr>
                   <td colSpan={6} className="p-12 text-center text-[#64748b]">
-                    <Building2 className="mx-auto mb-3 h-12 w-12 text-[#0f766e]" />
+                    <Building2 className="mx-auto mb-3 h-12 w-12 text-[#1d4ed8]" />
                     <p className="font-bold">Nenhum imovel encontrado</p>
                   </td>
                 </tr>
@@ -271,75 +271,75 @@ export function AdminProperties() {
       </section>
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#134e4a]/50 p-4 backdrop-blur-sm">
-          <div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-lg border border-[#99f6e4] bg-white shadow-2xl">
-            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#ccfbf1] bg-white p-5">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#0f2447]/50 p-4 backdrop-blur-sm">
+          <div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-lg border border-[#bfdbfe] bg-white shadow-2xl">
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#dbeafe] bg-white p-5">
               <div>
-                <h2 className="text-2xl font-bold text-[#134e4a]">{editingId ? "Editar imovel" : "Cadastrar imovel"}</h2>
+                <h2 className="text-2xl font-bold text-[#0f2447]">{editingId ? "Editar imovel" : "Cadastrar imovel"}</h2>
                 <p className="text-sm text-[#64748b]">Campos usados no site publico e no CRM.</p>
               </div>
-              <button onClick={() => setIsModalOpen(false)} className="focus-ring rounded-lg p-2 text-[#64748b] hover:bg-[#ccfbf1]" aria-label="Fechar">
+              <button onClick={() => setIsModalOpen(false)} className="focus-ring rounded-lg p-2 text-[#64748b] hover:bg-[#dbeafe]" aria-label="Fechar">
                 <X className="h-5 w-5" />
               </button>
             </div>
 
             <form onSubmit={handleCreateOrUpdate} className="grid gap-5 p-5">
               <div className="grid gap-4 md:grid-cols-3">
-                <label className="grid gap-2 text-sm font-bold text-[#134e4a] md:col-span-3">
+                <label className="grid gap-2 text-sm font-bold text-[#0f2447] md:col-span-3">
                   Titulo do anuncio
-                  <input required type="text" className="focus-ring rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-3" value={title} onChange={(e) => setTitle(e.target.value)} />
+                  <input required type="text" className="focus-ring rounded-lg border border-[#dbeafe] bg-[#f8fafc] p-3" value={title} onChange={(e) => setTitle(e.target.value)} />
                 </label>
-                <label className="grid gap-2 text-sm font-bold text-[#134e4a] md:col-span-3">
+                <label className="grid gap-2 text-sm font-bold text-[#0f2447] md:col-span-3">
                   Descricao
-                  <textarea required rows={4} className="focus-ring rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-3" value={description} onChange={(e) => setDescription(e.target.value)} />
+                  <textarea required rows={4} className="focus-ring rounded-lg border border-[#dbeafe] bg-[#f8fafc] p-3" value={description} onChange={(e) => setDescription(e.target.value)} />
                 </label>
-                <label className="grid gap-2 text-sm font-bold text-[#134e4a]">
+                <label className="grid gap-2 text-sm font-bold text-[#0f2447]">
                   Tipo
-                  <select className="focus-ring rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-3" value={type} onChange={(e) => setType(e.target.value)}>
+                  <select className="focus-ring rounded-lg border border-[#dbeafe] bg-[#f8fafc] p-3" value={type} onChange={(e) => setType(e.target.value)}>
                     <option value="VENDA">Venda</option>
                     <option value="LOCACAO">Locacao</option>
                   </select>
                 </label>
-                <label className="grid gap-2 text-sm font-bold text-[#134e4a]">
+                <label className="grid gap-2 text-sm font-bold text-[#0f2447]">
                   Status
-                  <select className="focus-ring rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-3" value={status} onChange={(e) => setStatus(e.target.value)}>
+                  <select className="focus-ring rounded-lg border border-[#dbeafe] bg-[#f8fafc] p-3" value={status} onChange={(e) => setStatus(e.target.value)}>
                     <option value="DISPONIVEL">Disponivel</option>
                     <option value="RESERVADO">Reservado</option>
                     <option value="VENDIDO">Vendido / Alugado</option>
                   </select>
                 </label>
-                <label className="grid gap-2 text-sm font-bold text-[#134e4a]">
+                <label className="grid gap-2 text-sm font-bold text-[#0f2447]">
                   Valor (R$)
-                  <input required type="number" className="focus-ring rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-3" value={price} onChange={(e) => setPrice(e.target.value)} />
+                  <input required type="number" className="focus-ring rounded-lg border border-[#dbeafe] bg-[#f8fafc] p-3" value={price} onChange={(e) => setPrice(e.target.value)} />
                 </label>
-                <label className="grid gap-2 text-sm font-bold text-[#134e4a]">
+                <label className="grid gap-2 text-sm font-bold text-[#0f2447]">
                   Quartos
-                  <input required type="number" min="0" className="focus-ring rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-3" value={bedrooms} onChange={(e) => setBedrooms(e.target.value)} />
+                  <input required type="number" min="0" className="focus-ring rounded-lg border border-[#dbeafe] bg-[#f8fafc] p-3" value={bedrooms} onChange={(e) => setBedrooms(e.target.value)} />
                 </label>
-                <label className="grid gap-2 text-sm font-bold text-[#134e4a]">
+                <label className="grid gap-2 text-sm font-bold text-[#0f2447]">
                   Banheiros
-                  <input required type="number" min="0" className="focus-ring rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-3" value={bathrooms} onChange={(e) => setBathrooms(e.target.value)} />
+                  <input required type="number" min="0" className="focus-ring rounded-lg border border-[#dbeafe] bg-[#f8fafc] p-3" value={bathrooms} onChange={(e) => setBathrooms(e.target.value)} />
                 </label>
-                <label className="grid gap-2 text-sm font-bold text-[#134e4a]">
+                <label className="grid gap-2 text-sm font-bold text-[#0f2447]">
                   Area (m²)
-                  <input required type="number" min="0" className="focus-ring rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-3" value={area} onChange={(e) => setArea(e.target.value)} />
+                  <input required type="number" min="0" className="focus-ring rounded-lg border border-[#dbeafe] bg-[#f8fafc] p-3" value={area} onChange={(e) => setArea(e.target.value)} />
                 </label>
-                <label className="grid gap-2 text-sm font-bold text-[#134e4a]">
+                <label className="grid gap-2 text-sm font-bold text-[#0f2447]">
                   Cidade
-                  <input required type="text" className="focus-ring rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-3" value={city} onChange={(e) => setCity(e.target.value)} />
+                  <input required type="text" className="focus-ring rounded-lg border border-[#dbeafe] bg-[#f8fafc] p-3" value={city} onChange={(e) => setCity(e.target.value)} />
                 </label>
-                <label className="grid gap-2 text-sm font-bold text-[#134e4a] md:col-span-2">
+                <label className="grid gap-2 text-sm font-bold text-[#0f2447] md:col-span-2">
                   Bairro
-                  <input required type="text" className="focus-ring rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-3" value={neighborhood} onChange={(e) => setNeighborhood(e.target.value)} />
+                  <input required type="text" className="focus-ring rounded-lg border border-[#dbeafe] bg-[#f8fafc] p-3" value={neighborhood} onChange={(e) => setNeighborhood(e.target.value)} />
                 </label>
-                <label className="grid gap-2 text-sm font-bold text-[#134e4a] md:col-span-3">
+                <label className="grid gap-2 text-sm font-bold text-[#0f2447] md:col-span-3">
                   URL da imagem principal
-                  <input type="url" placeholder="https://..." className="focus-ring rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-3 font-mono text-sm" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
+                  <input type="url" placeholder="https://..." className="focus-ring rounded-lg border border-[#dbeafe] bg-[#f8fafc] p-3 font-mono text-sm" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
                 </label>
               </div>
 
-              <div className="flex flex-col justify-end gap-3 border-t border-[#ccfbf1] pt-5 sm:flex-row">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="focus-ring rounded-lg border border-[#99f6e4] px-6 py-3 font-bold text-[#134e4a] hover:bg-[#ccfbf1]">
+              <div className="flex flex-col justify-end gap-3 border-t border-[#dbeafe] pt-5 sm:flex-row">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="focus-ring rounded-lg border border-[#bfdbfe] px-6 py-3 font-bold text-[#0f2447] hover:bg-[#dbeafe]">
                   Cancelar
                 </button>
                 <button type="submit" className="focus-ring rounded-lg bg-[#0369a1] px-8 py-3 font-bold text-white shadow-sm hover:bg-[#075985]">
