@@ -11,7 +11,7 @@ import {
   Square,
 } from "lucide-react";
 import { cn } from "../../../lib/utils";
-import { useAgency } from "../../../lib/AgencyContext";
+import { useResolvedAgency } from "../../../lib/useResolvedAgency";
 import { db, handleFirestoreError, OperationType } from "../../../lib/firebase";
 import { addDoc, collection, doc, getDoc, serverTimestamp } from "firebase/firestore";
 
@@ -31,8 +31,8 @@ type Property = {
 
 const fallbackImage = "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1600&q=80";
 
-export function PropertyDetail({ id }: { id: string }) {
-  const { agency, loading } = useAgency();
+export function PropertyDetail({ id, slug }: { id: string; slug?: string }) {
+  const { agency, loading } = useResolvedAgency(slug);
   const [property, setProperty] = useState<Property | null>(null);
   const [propLoading, setPropLoading] = useState(true);
   const [name, setName] = useState("");

@@ -5,7 +5,7 @@ import { format, formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { addDoc, collection, deleteDoc, doc, onSnapshot, orderBy, query, Timestamp, updateDoc } from "firebase/firestore";
 import { db, handleFirestoreError, OperationType } from "../../../lib/firebase";
-import { useAgency } from "../../../lib/AgencyContext";
+import { useAdminAgency } from "../../../lib/useAdminAgency";
 import { useAuth } from "../../../lib/AuthContext";
 
 type Lead = {
@@ -38,7 +38,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export function CRM() {
-  const { agency, loading: agencyLoading } = useAgency();
+  const { agency, loading: agencyLoading } = useAdminAgency();
   const { profile } = useAuth();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [searchTerm, setSearchTerm] = useState("");

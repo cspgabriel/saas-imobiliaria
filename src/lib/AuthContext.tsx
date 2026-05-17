@@ -9,6 +9,7 @@ interface AuthContextProps {
   loading: boolean;
   login: () => Promise<void>;
   logout: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextProps>({
@@ -17,6 +18,7 @@ const AuthContext = createContext<AuthContextProps>({
   loading: true,
   login: async () => {},
   logout: async () => {},
+  refreshProfile: async () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -32,18 +34,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const docRef = doc(db, "users", u.uid);
           const docSnap = await getDoc(docRef);
           if (docSnap.exists()) {
-            setProfile(docSnap.data());
+            setProfile({ ...docSnap.data(), uid: u.uid });
           } else {
-            // Auto bootstrap first user to demo agency as ADMIN
+            // Create minimal profile; agency binding happens at /onboarding
             const newProfile = {
               email: u.email,
               name: u.displayName,
               role: "ADMIN",
-              agencyId: "demo",
-              createdAt: new Date().toISOString()
+              agencyId: null,
+              createdAt: new Date().toISOString(),
             };
             await setDoc(docRef, newProfile);
-            setProfile(newProfile);
+            setProfile({ ...newProfile, uid: u.uid });
           }
         } catch (error) {
           console.error(error);
@@ -74,8 +76,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await signOut(auth);
   };
 
+  const refreshProfile = async () => {
+    if (!user) return;
+    const docRef = doc(db, "users", user.uid);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) setProfile({ ...docSnap.data(), uid: user.uid });
+  };
+
   return (
-    <AuthContext.Provider value={{ user, profile, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, profile, loading, login, logout, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

@@ -8,6 +8,8 @@ import {
   doc,
   Timestamp,
   getDoc,
+  addDoc,
+  updateDoc,
 } from "firebase/firestore";
 
 export interface Agency {
@@ -18,6 +20,78 @@ export interface Agency {
   plan: string;
   ownerId: string;
 }
+
+export const slugify = (input: string): string => {
+  return input
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .slice(0, 40);
+};
+
+export const isSlugAvailable = async (slug: string): Promise<boolean> => {
+  const q = query(collection(db, "agencies"), where("subdomain", "==", slug));
+  const snap = await getDocs(q);
+  return snap.empty;
+};
+
+export const generateUniqueSlug = async (name: string): Promise<string> => {
+  const base = slugify(name) || "imobiliaria";
+  if (await isSlugAvailable(base)) return base;
+  for (let i = 2; i <= 99; i++) {
+    const candidate = `${base}-${i}`;
+    if (await isSlugAvailable(candidate)) return candidate;
+  }
+  return `${base}-${Date.now()}`;
+};
+
+export const createAgency = async (params: {
+  name: string;
+  slug: string;
+  ownerId: string;
+  plan?: string;
+}): Promise<Agency> => {
+  const { name, slug, ownerId, plan = "trial" } = params;
+  const ref = await addDoc(collection(db, "agencies"), {
+    name,
+    subdomain: slug,
+    plan,
+    ownerId,
+    createdAt: Timestamp.now(),
+  });
+  return { id: ref.id, name, subdomain: slug, plan, ownerId };
+};
+
+export const getAgencyById = async (id: string): Promise<Agency | null> => {
+  try {
+    const snap = await getDoc(doc(db, "agencies", id));
+    if (!snap.exists()) return null;
+    return { id: snap.id, ...snap.data() } as Agency;
+  } catch (err) {
+    handleFirestoreError(err, OperationType.GET, `agencies/${id}`);
+    return null;
+  }
+};
+
+export const getAgencyBySlug = async (slug: string): Promise<Agency | null> => {
+  try {
+    const q = query(collection(db, "agencies"), where("subdomain", "==", slug));
+    const snap = await getDocs(q);
+    if (snap.empty) return null;
+    return { id: snap.docs[0].id, ...snap.docs[0].data() } as Agency;
+  } catch (err) {
+    handleFirestoreError(err, OperationType.LIST, "agencies");
+    return null;
+  }
+};
+
+export const bindUserToAgency = async (userId: string, agencyId: string): Promise<void> => {
+  await updateDoc(doc(db, "users", userId), { agencyId });
+};
 
 export const getAgencyByHost = async (
   hostname: string,

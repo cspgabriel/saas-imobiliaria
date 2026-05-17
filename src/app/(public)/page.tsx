@@ -14,7 +14,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
-import { useAgency } from "../../lib/AgencyContext";
+import { useResolvedAgency } from "../../lib/useResolvedAgency";
 import { db, handleFirestoreError, OperationType } from "../../lib/firebase";
 import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
 
@@ -52,8 +52,8 @@ const benefits = [
   },
 ];
 
-export function Home() {
-  const { agency, loading } = useAgency();
+export function Home({ slug }: { slug?: string } = {}) {
+  const { agency, loading } = useResolvedAgency(slug);
   const [properties, setProperties] = useState<Property[]>([]);
   const [typeFilter, setTypeFilter] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -118,7 +118,7 @@ export function Home() {
             <a className="focus-ring hover:text-[#1d4ed8]" href="#imoveis">Imoveis</a>
             <a className="focus-ring hover:text-[#1d4ed8]" href="#diferenciais">Diferenciais</a>
             <Link href="/admin" className="focus-ring hover:text-[#1d4ed8]">Area do corretor</Link>
-            <Link href="/saas" className="focus-ring rounded-lg bg-[#0369a1] px-4 py-3 font-bold text-white shadow-sm hover:bg-[#075985]">
+            <Link href="/landing" className="focus-ring rounded-lg bg-[#0369a1] px-4 py-3 font-bold text-white shadow-sm hover:bg-[#075985]">
               Plataforma SaaS
             </Link>
           </nav>
@@ -297,7 +297,7 @@ export function Home() {
             <div className="grid gap-3 text-[#dbeafe]">
               <a href="#imoveis">Imoveis</a>
               <Link href="/admin">Area do corretor</Link>
-              <Link href="/saas">Plataforma SaaS</Link>
+              <Link href="/landing">Plataforma SaaS</Link>
             </div>
           </div>
           <div>
