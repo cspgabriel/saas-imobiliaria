@@ -19,6 +19,11 @@ export function useAdminAgency() {
           const demoAgency = await getAgencyById("demo");
           if (!demoAgency) {
             console.warn('Agência demo "demo" não encontrada para acesso admin sem autenticação.');
+            if (!cancelled) {
+              setAgency(null);
+              setLoading(false);
+            }
+            return;
           }
           if (!cancelled) {
             setAgency(demoAgency);
@@ -39,7 +44,8 @@ export function useAdminAgency() {
           setLoading(false);
         }
       } catch (err) {
-        console.error("Falha ao carregar agência admin.", err);
+        const loadContext = hasProfile ? `auth agencyId=${agencyId ?? "none"}` : "demo unauthenticated";
+        console.error(`Falha ao carregar agência admin (${loadContext}).`, err);
         if (!cancelled) {
           setAgency(null);
           setLoading(false);
