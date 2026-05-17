@@ -34,11 +34,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (authLoading) return;
-    if (!profile) {
-      navigate("/landing");
-      return;
-    }
-    if (!profile.agencyId) {
+    if (profile && !profile.agencyId) {
       navigate("/onboarding");
     }
   }, [authLoading, profile, navigate]);

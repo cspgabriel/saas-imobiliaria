@@ -10,22 +10,37 @@ export function useAdminAgency() {
   useEffect(() => {
     let cancelled = false;
     if (authLoading) return;
-    if (!profile?.agencyId) {
-      setAgency(null);
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    getAgencyById(profile.agencyId).then((ag) => {
+
+    const loadAgency = async () => {
+      if (!profile) {
+        const demoAgency = await getAgencyById("demo");
+        if (!cancelled) {
+          setAgency(demoAgency);
+          setLoading(false);
+        }
+        return;
+      }
+
+      if (!profile.agencyId) {
+        setAgency(null);
+        setLoading(false);
+        return;
+      }
+
+      const ag = await getAgencyById(profile.agencyId);
       if (!cancelled) {
         setAgency(ag);
         setLoading(false);
       }
-    });
+    };
+
+    setLoading(true);
+    loadAgency();
+
     return () => {
       cancelled = true;
     };
-  }, [profile?.agencyId, authLoading]);
+  }, [profile, authLoading]);
 
   return { agency, loading };
 }
