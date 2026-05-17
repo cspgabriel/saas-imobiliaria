@@ -94,35 +94,35 @@ export function Home() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f0fdfa] px-4 text-center">
-        <p className="text-lg font-bold text-[#0f766e]">Carregando {agencyName}...</p>
+      <div className="flex min-h-screen items-center justify-center bg-[#f0f4ff] px-4 text-center">
+        <p className="text-lg font-bold text-[#1d4ed8]">Carregando {agencyName}...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#f0fdfa] text-[#134e4a]">
-      <a href="#imoveis" className="focus-ring sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[80] focus:bg-white focus:px-4 focus:py-3 focus:text-[#134e4a] focus:shadow-lg">
+    <div className="min-h-screen bg-[#f0f4ff] text-[#0f2447]">
+      <a href="#imoveis" className="focus-ring sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[80] focus:bg-white focus:px-4 focus:py-3 focus:text-[#0f2447] focus:shadow-lg">
         Ir para imoveis
       </a>
 
-      <header className="sticky top-0 z-50 border-b border-[#99f6e4]/70 bg-white/90 backdrop-blur">
+      <header className="sticky top-0 z-50 border-b border-[#bfdbfe]/70 bg-white/90 backdrop-blur">
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6">
           <Link href="/" className="focus-ring flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#0f766e] text-white shadow-sm">
+            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#1d4ed8] text-white shadow-sm">
               <Building2 className="h-5 w-5" />
             </span>
-            <span className="font-display text-lg font-bold text-[#134e4a] sm:text-xl">{agencyName}</span>
+            <span className="font-display text-lg font-bold text-[#0f2447] sm:text-xl">{agencyName}</span>
           </Link>
-          <nav className="hidden items-center gap-7 text-sm font-semibold text-[#134e4a]/75 md:flex">
-            <a className="focus-ring hover:text-[#0f766e]" href="#imoveis">Imoveis</a>
-            <a className="focus-ring hover:text-[#0f766e]" href="#diferenciais">Diferenciais</a>
-            <Link href="/admin" className="focus-ring hover:text-[#0f766e]">Area do corretor</Link>
+          <nav className="hidden items-center gap-7 text-sm font-semibold text-[#0f2447]/75 md:flex">
+            <a className="focus-ring hover:text-[#1d4ed8]" href="#imoveis">Imoveis</a>
+            <a className="focus-ring hover:text-[#1d4ed8]" href="#diferenciais">Diferenciais</a>
+            <Link href="/admin" className="focus-ring hover:text-[#1d4ed8]">Area do corretor</Link>
             <Link href="/saas" className="focus-ring rounded-lg bg-[#0369a1] px-4 py-3 font-bold text-white shadow-sm hover:bg-[#075985]">
               Plataforma SaaS
             </Link>
           </nav>
-          <a href="https://wa.me/5511999999999" target="_blank" rel="noopener noreferrer" className="focus-ring inline-flex items-center gap-2 rounded-lg border border-[#99f6e4] px-4 py-3 text-sm font-bold text-[#0f766e] hover:bg-[#ccfbf1] md:hidden">
+          <a href="https://wa.me/5511999999999" target="_blank" rel="noopener noreferrer" className="focus-ring inline-flex items-center gap-2 rounded-lg border border-[#bfdbfe] px-4 py-3 text-sm font-bold text-[#1d4ed8] hover:bg-[#dbeafe] md:hidden">
             <MessageCircle className="h-4 w-4" />
             WhatsApp
           </a>
@@ -130,16 +130,16 @@ export function Home() {
       </header>
 
       <main>
-        <section className="relative isolate overflow-hidden bg-[#134e4a] text-white">
+        <section className="relative isolate overflow-hidden bg-[#0f2447] text-white">
           <img
             src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1800&q=80"
             alt="Fachada de casa moderna"
             className="absolute inset-0 -z-10 h-full w-full object-cover opacity-35"
           />
-          <div className="absolute inset-0 -z-10 bg-[#134e4a]/80" />
+          <div className="absolute inset-0 -z-10 bg-[#0f2447]/80" />
           <div className="mx-auto grid min-h-[680px] max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1fr_0.85fr]">
             <div className="max-w-3xl">
-              <p className="mb-4 inline-flex rounded-lg border border-white/25 bg-white/10 px-3 py-2 text-sm font-bold text-[#ccfbf1]">
+              <p className="mb-4 inline-flex rounded-lg border border-white/25 bg-white/10 px-3 py-2 text-sm font-bold text-[#dbeafe]">
                 Curadoria imobiliaria para comprar ou alugar melhor
               </p>
               <h1 className="font-display text-5xl font-bold leading-none sm:text-6xl lg:text-7xl">
@@ -150,19 +150,19 @@ export function Home() {
               </p>
             </div>
 
-            <form className="rounded-lg border border-white/20 bg-white p-4 text-[#134e4a] shadow-2xl" onSubmit={(event) => event.preventDefault()}>
-              <div className="mb-4 flex items-center gap-3 border-b border-[#ccfbf1] pb-4">
-                <Search className="h-6 w-6 text-[#0f766e]" />
+            <form className="rounded-lg border border-white/20 bg-white p-4 text-[#0f2447] shadow-2xl" onSubmit={(event) => event.preventDefault()}>
+              <div className="mb-4 flex items-center gap-3 border-b border-[#dbeafe] pb-4">
+                <Search className="h-6 w-6 text-[#1d4ed8]" />
                 <div>
                   <h2 className="text-xl font-bold">Buscar oportunidade</h2>
                   <p className="text-sm text-[#64748b]">Filtre por bairro, cidade ou tipo de negocio.</p>
                 </div>
               </div>
               <div className="grid gap-3">
-                <label className="grid gap-2 text-sm font-bold text-[#134e4a]">
+                <label className="grid gap-2 text-sm font-bold text-[#0f2447]">
                   Tipo
                   <select
-                    className="focus-ring rounded-lg border border-[#99f6e4] bg-[#f8fafc] px-4 py-4 text-[#134e4a]"
+                    className="focus-ring rounded-lg border border-[#bfdbfe] bg-[#f8fafc] px-4 py-4 text-[#0f2447]"
                     value={typeFilter}
                     onChange={(e) => setTypeFilter(e.target.value)}
                   >
@@ -171,12 +171,12 @@ export function Home() {
                     <option value="LOCACAO">Alugar</option>
                   </select>
                 </label>
-                <label className="grid gap-2 text-sm font-bold text-[#134e4a]">
+                <label className="grid gap-2 text-sm font-bold text-[#0f2447]">
                   Localizacao
                   <input
                     type="search"
                     placeholder="Cidade, bairro ou nome do imovel"
-                    className="focus-ring rounded-lg border border-[#99f6e4] bg-[#f8fafc] px-4 py-4 text-[#134e4a] placeholder:text-[#64748b]"
+                    className="focus-ring rounded-lg border border-[#bfdbfe] bg-[#f8fafc] px-4 py-4 text-[#0f2447] placeholder:text-[#64748b]"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
@@ -190,15 +190,15 @@ export function Home() {
           </div>
         </section>
 
-        <section id="diferenciais" className="border-b border-[#99f6e4] bg-white">
+        <section id="diferenciais" className="border-b border-[#bfdbfe] bg-white">
           <div className="mx-auto grid max-w-7xl gap-4 px-4 py-12 sm:px-6 md:grid-cols-3">
             {benefits.map((benefit) => (
-              <div key={benefit.title} className="flex gap-4 rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-5">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#ccfbf1] text-[#0f766e]">
+              <div key={benefit.title} className="flex gap-4 rounded-lg border border-[#dbeafe] bg-[#f8fafc] p-5">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#dbeafe] text-[#1d4ed8]">
                   <benefit.icon className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-[#134e4a]">{benefit.title}</h3>
+                  <h3 className="font-bold text-[#0f2447]">{benefit.title}</h3>
                   <p className="mt-2 text-sm leading-6 text-[#475569]">{benefit.desc}</p>
                 </div>
               </div>
@@ -210,20 +210,20 @@ export function Home() {
           <div className="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
               <p className="text-sm font-bold text-[#0369a1]">Carteira em destaque</p>
-              <h2 className="font-display mt-3 text-4xl font-bold text-[#134e4a]">Imoveis para visitar esta semana</h2>
+              <h2 className="font-display mt-3 text-4xl font-bold text-[#0f2447]">Imoveis para visitar esta semana</h2>
               <p className="mt-3 max-w-2xl text-lg leading-8 text-[#475569]">
                 {filteredProperties.length} oportunidade{filteredProperties.length === 1 ? "" : "s"} disponivel{filteredProperties.length === 1 ? "" : "is"} conforme os filtros atuais.
               </p>
             </div>
-            <div className="rounded-lg border border-[#99f6e4] bg-white px-4 py-3 text-sm font-bold text-[#0f766e]">
+            <div className="rounded-lg border border-[#bfdbfe] bg-white px-4 py-3 text-sm font-bold text-[#1d4ed8]">
               Atendimento via WhatsApp em horario comercial
             </div>
           </div>
 
           {filteredProperties.length === 0 ? (
-            <div className="rounded-lg border border-[#99f6e4] bg-white p-10 text-center shadow-sm">
-              <HomeIcon className="mx-auto mb-4 h-12 w-12 text-[#0f766e]" />
-              <h3 className="text-2xl font-bold text-[#134e4a]">Nenhum imovel encontrado</h3>
+            <div className="rounded-lg border border-[#bfdbfe] bg-white p-10 text-center shadow-sm">
+              <HomeIcon className="mx-auto mb-4 h-12 w-12 text-[#1d4ed8]" />
+              <h3 className="text-2xl font-bold text-[#0f2447]">Nenhum imovel encontrado</h3>
               <p className="mx-auto mt-3 max-w-xl text-[#475569]">Ajuste os filtros ou fale com um corretor para receber opcoes fora do catalogo publico.</p>
             </div>
           ) : (
@@ -232,9 +232,9 @@ export function Home() {
                 <Link
                   href={`/imovel/${prop.id}`}
                   key={prop.id}
-                  className="focus-ring group flex min-h-full flex-col overflow-hidden rounded-lg border border-[#99f6e4] bg-white shadow-sm transition-colors duration-200 hover:border-[#14b8a6]"
+                  className="focus-ring group flex min-h-full flex-col overflow-hidden rounded-lg border border-[#bfdbfe] bg-white shadow-sm transition-colors duration-200 hover:border-[#2563eb]"
                 >
-                  <div className="relative aspect-[4/3] bg-[#ccfbf1]">
+                  <div className="relative aspect-[4/3] bg-[#dbeafe]">
                     <img
                       src={prop.imageUrl || fallbackImage}
                       alt={prop.title}
@@ -243,7 +243,7 @@ export function Home() {
                     <span
                       className={cn(
                         "absolute left-4 top-4 rounded-lg px-3 py-2 text-xs font-bold text-white shadow-sm",
-                        prop.type === "VENDA" ? "bg-[#0369a1]" : "bg-[#0f766e]"
+                        prop.type === "VENDA" ? "bg-[#0369a1]" : "bg-[#1d4ed8]"
                       )}
                     >
                       {prop.type === "VENDA" ? "Venda" : "Locacao"}
@@ -251,25 +251,25 @@ export function Home() {
                   </div>
                   <div className="flex flex-1 flex-col p-5">
                     <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-[#64748b]">
-                      <MapPin className="h-4 w-4 text-[#0f766e]" />
+                      <MapPin className="h-4 w-4 text-[#1d4ed8]" />
                       {prop.neighborhood}, {prop.city}
                     </div>
-                    <h3 className="line-clamp-2 text-xl font-bold leading-7 text-[#134e4a] group-hover:text-[#0369a1]">
+                    <h3 className="line-clamp-2 text-xl font-bold leading-7 text-[#0f2447] group-hover:text-[#0369a1]">
                       {prop.title}
                     </h3>
-                    <div className="my-5 grid grid-cols-3 gap-2 border-y border-[#ccfbf1] py-4 text-sm font-bold text-[#475569]">
-                      <span className="flex items-center gap-2"><BedDouble className="h-4 w-4 text-[#0f766e]" />{prop.bedrooms}</span>
-                      <span className="flex items-center gap-2"><Bath className="h-4 w-4 text-[#0f766e]" />{prop.bathrooms}</span>
-                      <span className="flex items-center gap-2"><Square className="h-4 w-4 text-[#0f766e]" />{prop.area}m²</span>
+                    <div className="my-5 grid grid-cols-3 gap-2 border-y border-[#dbeafe] py-4 text-sm font-bold text-[#475569]">
+                      <span className="flex items-center gap-2"><BedDouble className="h-4 w-4 text-[#1d4ed8]" />{prop.bedrooms}</span>
+                      <span className="flex items-center gap-2"><Bath className="h-4 w-4 text-[#1d4ed8]" />{prop.bathrooms}</span>
+                      <span className="flex items-center gap-2"><Square className="h-4 w-4 text-[#1d4ed8]" />{prop.area}m²</span>
                     </div>
                     <div className="mt-auto flex items-end justify-between gap-3">
                       <div>
                         <p className="text-xs font-bold text-[#64748b]">Investimento</p>
-                        <p className="text-2xl font-bold text-[#134e4a]">
+                        <p className="text-2xl font-bold text-[#0f2447]">
                           {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(prop.price)}
                         </p>
                       </div>
-                      <span className="rounded-lg bg-[#ccfbf1] px-3 py-2 text-sm font-bold text-[#0f766e]">Detalhes</span>
+                      <span className="rounded-lg bg-[#dbeafe] px-3 py-2 text-sm font-bold text-[#1d4ed8]">Detalhes</span>
                     </div>
                   </div>
                 </Link>
@@ -279,22 +279,22 @@ export function Home() {
         </section>
       </main>
 
-      <footer className="border-t border-[#99f6e4] bg-[#134e4a] px-4 py-12 text-white sm:px-6">
+      <footer className="border-t border-[#bfdbfe] bg-[#0f2447] px-4 py-12 text-white sm:px-6">
         <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-[1.3fr_0.7fr_0.7fr]">
           <div>
             <div className="mb-4 flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-white text-[#0f766e]">
+              <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-white text-[#1d4ed8]">
                 <Building2 className="h-5 w-5" />
               </span>
               <span className="font-display text-xl font-bold">{agencyName}</span>
             </div>
-            <p className="max-w-lg leading-7 text-[#ccfbf1]">
+            <p className="max-w-lg leading-7 text-[#dbeafe]">
               Atendimento imobiliario com clareza, processo e tecnologia para transformar busca em decisao.
             </p>
           </div>
           <div>
             <h4 className="mb-4 font-bold">Navegacao</h4>
-            <div className="grid gap-3 text-[#ccfbf1]">
+            <div className="grid gap-3 text-[#dbeafe]">
               <a href="#imoveis">Imoveis</a>
               <Link href="/admin">Area do corretor</Link>
               <Link href="/saas">Plataforma SaaS</Link>
@@ -302,7 +302,7 @@ export function Home() {
           </div>
           <div>
             <h4 className="mb-4 font-bold">Contato</h4>
-            <div className="grid gap-3 text-[#ccfbf1]">
+            <div className="grid gap-3 text-[#dbeafe]">
               <span className="flex items-center gap-2"><MapPin className="h-4 w-4" /> Brasil</span>
               <a href={`mailto:contato@${agency?.subdomain || "imobiliaria"}.com.br`}>contato@{agency?.subdomain || "imobiliaria"}.com.br</a>
             </div>

@@ -86,7 +86,7 @@ export function PropertyDetail({ id }: { id: string }) {
 
   if (loading || propLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f0fdfa] px-4 text-center text-lg font-bold text-[#0f766e]">
+      <div className="flex min-h-screen items-center justify-center bg-[#f0f4ff] px-4 text-center text-lg font-bold text-[#1d4ed8]">
         Carregando imovel...
       </div>
     );
@@ -94,9 +94,9 @@ export function PropertyDetail({ id }: { id: string }) {
 
   if (!property) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f0fdfa] px-4 text-center">
+      <div className="flex min-h-screen items-center justify-center bg-[#f0f4ff] px-4 text-center">
         <div>
-          <h1 className="font-display text-3xl font-bold text-[#134e4a]">Imovel nao encontrado</h1>
+          <h1 className="font-display text-3xl font-bold text-[#0f2447]">Imovel nao encontrado</h1>
           <Link href="/" className="focus-ring mt-5 inline-flex rounded-lg bg-[#0369a1] px-5 py-3 font-bold text-white hover:bg-[#075985]">
             Voltar para o site
           </Link>
@@ -106,10 +106,10 @@ export function PropertyDetail({ id }: { id: string }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#f0fdfa] text-[#134e4a]">
-      <header className="sticky top-0 z-50 border-b border-[#99f6e4]/70 bg-white/90 backdrop-blur">
+    <div className="min-h-screen bg-[#f0f4ff] text-[#0f2447]">
+      <header className="sticky top-0 z-50 border-b border-[#bfdbfe]/70 bg-white/90 backdrop-blur">
         <div className="mx-auto flex h-18 max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
-          <Link href="/" className="focus-ring inline-flex items-center gap-2 rounded-lg px-3 py-2 font-bold text-[#134e4a] hover:bg-[#ccfbf1]">
+          <Link href="/" className="focus-ring inline-flex items-center gap-2 rounded-lg px-3 py-2 font-bold text-[#0f2447] hover:bg-[#dbeafe]">
             <ArrowLeft className="h-5 w-5" />
             Voltar para imoveis
           </Link>
@@ -123,7 +123,7 @@ export function PropertyDetail({ id }: { id: string }) {
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:py-12">
         <div className="grid gap-8 lg:grid-cols-[1fr_390px]">
           <section className="space-y-8">
-            <div className="overflow-hidden rounded-lg border border-[#99f6e4] bg-white shadow-sm">
+            <div className="overflow-hidden rounded-lg border border-[#bfdbfe] bg-white shadow-sm">
               <img
                 src={property.imageUrl || fallbackImage}
                 alt={property.title}
@@ -131,26 +131,26 @@ export function PropertyDetail({ id }: { id: string }) {
               />
             </div>
 
-            <div className="rounded-lg border border-[#99f6e4] bg-white p-6 shadow-sm">
+            <div className="rounded-lg border border-[#bfdbfe] bg-white p-6 shadow-sm">
               <div className="mb-5 flex flex-wrap items-center gap-2">
                 <span
                   className={cn(
                     "rounded-lg px-3 py-2 text-xs font-bold text-white",
-                    property.type === "VENDA" ? "bg-[#0369a1]" : "bg-[#0f766e]"
+                    property.type === "VENDA" ? "bg-[#0369a1]" : "bg-[#1d4ed8]"
                   )}
                 >
                   {property.type === "VENDA" ? "Venda" : "Locacao"}
                 </span>
-                <span className="rounded-lg bg-[#ccfbf1] px-3 py-2 text-xs font-bold text-[#0f766e]">
+                <span className="rounded-lg bg-[#dbeafe] px-3 py-2 text-xs font-bold text-[#1d4ed8]">
                   Atendimento consultivo
                 </span>
               </div>
 
-              <h1 className="font-display max-w-4xl text-4xl font-bold leading-tight text-[#134e4a] md:text-5xl">
+              <h1 className="font-display max-w-4xl text-4xl font-bold leading-tight text-[#0f2447] md:text-5xl">
                 {property.title}
               </h1>
               <div className="mt-5 flex items-center gap-2 text-lg font-semibold text-[#475569]">
-                <MapPin className="h-5 w-5 text-[#0f766e]" />
+                <MapPin className="h-5 w-5 text-[#1d4ed8]" />
                 {property.neighborhood}, {property.city}
               </div>
             </div>
@@ -161,22 +161,22 @@ export function PropertyDetail({ id }: { id: string }) {
                 { icon: Bath, label: "Banheiros", value: property.bathrooms },
                 { icon: Square, label: "Metros quadrados", value: `${property.area}m²` },
               ].map((item) => (
-                <div key={item.label} className="rounded-lg border border-[#99f6e4] bg-white p-5 shadow-sm">
-                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-[#ccfbf1] text-[#0f766e]">
+                <div key={item.label} className="rounded-lg border border-[#bfdbfe] bg-white p-5 shadow-sm">
+                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-[#dbeafe] text-[#1d4ed8]">
                     <item.icon className="h-5 w-5" />
                   </div>
-                  <strong className="block text-3xl text-[#134e4a]">{item.value}</strong>
+                  <strong className="block text-3xl text-[#0f2447]">{item.value}</strong>
                   <span className="mt-1 block text-sm font-bold text-[#64748b]">{item.label}</span>
                 </div>
               ))}
             </div>
 
-            <section className="rounded-lg border border-[#99f6e4] bg-white p-6 shadow-sm">
-              <h2 className="font-display text-3xl font-bold text-[#134e4a]">Sobre o imovel</h2>
+            <section className="rounded-lg border border-[#bfdbfe] bg-white p-6 shadow-sm">
+              <h2 className="font-display text-3xl font-bold text-[#0f2447]">Sobre o imovel</h2>
               <p className="mt-4 text-lg leading-8 text-[#475569]">{property.description}</p>
               <div className="mt-6 grid gap-3 sm:grid-cols-3">
                 {["Documentacao acompanhada", "Visita com horario marcado", "Corretor especialista"].map((item) => (
-                  <div key={item} className="flex items-center gap-2 rounded-lg bg-[#f0fdfa] px-4 py-3 text-sm font-bold text-[#0f766e]">
+                  <div key={item} className="flex items-center gap-2 rounded-lg bg-[#f0f4ff] px-4 py-3 text-sm font-bold text-[#1d4ed8]">
                     <CheckCircle2 className="h-4 w-4" />
                     {item}
                   </div>
@@ -186,16 +186,16 @@ export function PropertyDetail({ id }: { id: string }) {
           </section>
 
           <aside id="contato" className="lg:sticky lg:top-28 lg:self-start">
-            <div className="rounded-lg border border-[#99f6e4] bg-white shadow-xl shadow-[#0f766e]/10">
-              <div className="border-b border-[#ccfbf1] p-6">
+            <div className="rounded-lg border border-[#bfdbfe] bg-white shadow-xl shadow-[#1d4ed8]/10">
+              <div className="border-b border-[#dbeafe] p-6">
                 <p className="text-sm font-bold text-[#64748b]">Investimento</p>
-                <p className="mt-2 text-4xl font-bold text-[#134e4a]">
+                <p className="mt-2 text-4xl font-bold text-[#0f2447]">
                   {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(property.price)}
                 </p>
               </div>
 
               <div className="p-6">
-                <h2 className="text-xl font-bold text-[#134e4a]">Quero falar com um corretor</h2>
+                <h2 className="text-xl font-bold text-[#0f2447]">Quero falar com um corretor</h2>
                 <p className="mt-2 text-sm leading-6 text-[#64748b]">
                   Envie seus dados para receber disponibilidade, agenda de visita e condicoes de negociacao.
                 </p>
@@ -206,33 +206,33 @@ export function PropertyDetail({ id }: { id: string }) {
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit} className="mt-6 grid gap-4">
-                    <label className="grid gap-2 text-sm font-bold text-[#134e4a]">
+                    <label className="grid gap-2 text-sm font-bold text-[#0f2447]">
                       Nome completo
                       <input
                         autoFocus
                         required
                         type="text"
-                        className="focus-ring rounded-lg border border-[#99f6e4] bg-[#f8fafc] px-4 py-3 text-[#134e4a]"
+                        className="focus-ring rounded-lg border border-[#bfdbfe] bg-[#f8fafc] px-4 py-3 text-[#0f2447]"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                       />
                     </label>
-                    <label className="grid gap-2 text-sm font-bold text-[#134e4a]">
+                    <label className="grid gap-2 text-sm font-bold text-[#0f2447]">
                       E-mail
                       <input
                         required
                         type="email"
-                        className="focus-ring rounded-lg border border-[#99f6e4] bg-[#f8fafc] px-4 py-3 text-[#134e4a]"
+                        className="focus-ring rounded-lg border border-[#bfdbfe] bg-[#f8fafc] px-4 py-3 text-[#0f2447]"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                       />
                     </label>
-                    <label className="grid gap-2 text-sm font-bold text-[#134e4a]">
+                    <label className="grid gap-2 text-sm font-bold text-[#0f2447]">
                       Telefone ou WhatsApp
                       <input
                         required
                         type="tel"
-                        className="focus-ring rounded-lg border border-[#99f6e4] bg-[#f8fafc] px-4 py-3 text-[#134e4a]"
+                        className="focus-ring rounded-lg border border-[#bfdbfe] bg-[#f8fafc] px-4 py-3 text-[#0f2447]"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                       />

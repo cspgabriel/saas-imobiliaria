@@ -77,36 +77,36 @@ export function AdminMarketing() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  if (loading) return <div className="p-6 text-lg font-bold text-[#0f766e]">Carregando...</div>;
+  if (loading) return <div className="p-6 text-lg font-bold text-[#1d4ed8]">Carregando...</div>;
 
   const platforms = [
     { key: "FACEBOOK" as const, label: "Facebook", icon: Facebook, color: "text-[#1877f2]" },
     { key: "INSTAGRAM" as const, label: "Instagram", icon: Instagram, color: "text-[#c13584]" },
-    { key: "GOOGLE" as const, label: "Google", icon: Search, color: "text-[#0f766e]" },
+    { key: "GOOGLE" as const, label: "Google", icon: Search, color: "text-[#1d4ed8]" },
   ];
 
   return (
     <div className="mx-auto max-w-7xl p-4 pb-28 sm:p-6 lg:p-8">
-      <section className="mb-6 rounded-lg border border-[#99f6e4] bg-white p-6 shadow-sm">
+      <section className="mb-6 rounded-lg border border-[#bfdbfe] bg-white p-6 shadow-sm">
         <p className="text-sm font-bold text-[#0369a1]">Marketing com IA</p>
-        <h1 className="font-display mt-2 text-4xl font-bold text-[#134e4a]">Gerador de anuncios imobiliarios</h1>
+        <h1 className="font-display mt-2 text-4xl font-bold text-[#0f2447]">Gerador de anuncios imobiliarios</h1>
         <p className="mt-3 max-w-3xl text-[#475569]">
           Transforme dados do imovel em copy pronta para campanha, mantendo contexto comercial e chamada clara para atendimento.
         </p>
       </section>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[0.8fr_1fr]">
-        <section className="rounded-lg border border-[#99f6e4] bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-bold text-[#134e4a]">Configurar anuncio</h2>
+        <section className="rounded-lg border border-[#bfdbfe] bg-white p-6 shadow-sm">
+          <h2 className="text-xl font-bold text-[#0f2447]">Configurar anuncio</h2>
           <p className="mt-2 text-sm leading-6 text-[#64748b]">Escolha o imovel, canal e gere uma copy com base no cadastro.</p>
 
           <div className="mt-6 grid gap-5">
-            <label className="grid gap-2 text-sm font-bold text-[#134e4a]">
+            <label className="grid gap-2 text-sm font-bold text-[#0f2447]">
               Imovel
               <select
                 value={selectedPropId}
                 onChange={(e) => setSelectedPropId(e.target.value)}
-                className="focus-ring rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-4 text-[#134e4a]"
+                className="focus-ring rounded-lg border border-[#dbeafe] bg-[#f8fafc] p-4 text-[#0f2447]"
               >
                 {properties.map((property) => (
                   <option key={property.id} value={property.id}>
@@ -117,8 +117,8 @@ export function AdminMarketing() {
             </label>
 
             <div>
-              <p className="mb-3 text-sm font-bold text-[#134e4a]">Canal</p>
-              <div className="grid grid-cols-3 gap-2 rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-2">
+              <p className="mb-3 text-sm font-bold text-[#0f2447]">Canal</p>
+              <div className="grid grid-cols-3 gap-2 rounded-lg border border-[#dbeafe] bg-[#f8fafc] p-2">
                 {platforms.map((platform) => (
                   <button
                     key={platform.key}
@@ -126,7 +126,7 @@ export function AdminMarketing() {
                     onClick={() => setAdPlatform(platform.key)}
                     className={cn(
                       "focus-ring flex min-h-24 flex-col items-center justify-center gap-2 rounded-lg px-2 py-3 text-xs font-bold transition-colors duration-200",
-                      adPlatform === platform.key ? "bg-white text-[#134e4a] shadow-sm" : "text-[#64748b] hover:bg-white/70"
+                      adPlatform === platform.key ? "bg-white text-[#0f2447] shadow-sm" : "text-[#64748b] hover:bg-white/70"
                     )}
                   >
                     <platform.icon className={cn("h-5 w-5", platform.color)} />
@@ -137,9 +137,9 @@ export function AdminMarketing() {
             </div>
 
             {selectedProperty && (
-              <div className="rounded-lg border border-[#ccfbf1] bg-[#f0fdfa] p-4">
-                <p className="text-sm font-bold text-[#0f766e]">Resumo usado pela IA</p>
-                <h3 className="mt-2 font-bold text-[#134e4a]">{selectedProperty.title}</h3>
+              <div className="rounded-lg border border-[#dbeafe] bg-[#f0f4ff] p-4">
+                <p className="text-sm font-bold text-[#1d4ed8]">Resumo usado pela IA</p>
+                <h3 className="mt-2 font-bold text-[#0f2447]">{selectedProperty.title}</h3>
                 <p className="mt-1 text-sm text-[#64748b]">
                   {selectedProperty.city} - {selectedProperty.neighborhood} | {selectedProperty.bedrooms} quartos | {selectedProperty.area}m²
                 </p>
@@ -149,7 +149,7 @@ export function AdminMarketing() {
             <button
               onClick={generateAd}
               disabled={isGenerating || !selectedPropId}
-              className="focus-ring inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#134e4a] p-4 font-bold text-white shadow-sm hover:bg-[#0f766e] disabled:cursor-not-allowed disabled:opacity-60"
+              className="focus-ring inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#0f2447] p-4 font-bold text-white shadow-sm hover:bg-[#1d4ed8] disabled:cursor-not-allowed disabled:opacity-60"
             >
               <Sparkles className="h-5 w-5 text-[#facc15]" />
               {isGenerating ? "Gerando..." : "Gerar copy de alta conversao"}
@@ -157,27 +157,27 @@ export function AdminMarketing() {
           </div>
         </section>
 
-        <section className="flex min-h-[560px] flex-col rounded-lg border border-[#99f6e4] bg-white p-6 shadow-sm">
+        <section className="flex min-h-[560px] flex-col rounded-lg border border-[#bfdbfe] bg-white p-6 shadow-sm">
           <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
             <div>
-              <h2 className="text-xl font-bold text-[#134e4a]">Preview da copy</h2>
+              <h2 className="text-xl font-bold text-[#0f2447]">Preview da copy</h2>
               <p className="mt-1 text-sm text-[#64748b]">Texto pronto para revisar, ajustar e publicar.</p>
             </div>
             {generatedAd && (
-              <button onClick={copyToClipboard} className="focus-ring inline-flex items-center justify-center gap-2 rounded-lg border border-[#99f6e4] px-4 py-3 text-sm font-bold text-[#0f766e] hover:bg-[#ccfbf1]">
+              <button onClick={copyToClipboard} className="focus-ring inline-flex items-center justify-center gap-2 rounded-lg border border-[#bfdbfe] px-4 py-3 text-sm font-bold text-[#1d4ed8] hover:bg-[#dbeafe]">
                 {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                 {copied ? "Copiado" : "Copiar"}
               </button>
             )}
           </div>
 
-          <div className="flex-1 rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-5 text-sm font-semibold leading-7 text-[#475569] shadow-inner">
+          <div className="flex-1 rounded-lg border border-[#dbeafe] bg-[#f8fafc] p-5 text-sm font-semibold leading-7 text-[#475569] shadow-inner">
             {generatedAd ? (
               <pre className="whitespace-pre-wrap font-sans">{generatedAd}</pre>
             ) : (
               <div className="flex h-full min-h-80 items-center justify-center text-center text-[#64748b]">
                 <div>
-                  <Sparkles className="mx-auto mb-4 h-10 w-10 text-[#0f766e]" />
+                  <Sparkles className="mx-auto mb-4 h-10 w-10 text-[#1d4ed8]" />
                   <p className="font-bold">A copy gerada aparecera aqui.</p>
                   <p className="mt-2 max-w-md text-sm">Use o cadastro do imovel para criar uma primeira versao comercial mais rapido.</p>
                 </div>

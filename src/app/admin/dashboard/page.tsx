@@ -66,7 +66,7 @@ export function AdminDashboard() {
         value: stats.totalProperties,
         desc: `${stats.availableProperties} disponiveis`,
         icon: Building2,
-        color: "bg-[#ccfbf1] text-[#0f766e]",
+        color: "bg-[#dbeafe] text-[#1d4ed8]",
       },
       {
         name: "Leads",
@@ -93,21 +93,21 @@ export function AdminDashboard() {
   }, [stats]);
 
   if (loading || !stats) {
-    return <div className="p-6 text-lg font-bold text-[#0f766e]">Carregando metricas...</div>;
+    return <div className="p-6 text-lg font-bold text-[#1d4ed8]">Carregando metricas...</div>;
   }
 
   return (
     <div className="mx-auto max-w-7xl p-4 pb-28 sm:p-6 lg:p-8">
-      <section className="mb-6 rounded-lg border border-[#99f6e4] bg-white p-6 shadow-sm">
+      <section className="mb-6 rounded-lg border border-[#bfdbfe] bg-white p-6 shadow-sm">
         <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
           <div>
             <p className="text-sm font-bold text-[#0369a1]">Resumo operacional</p>
-            <h1 className="font-display mt-2 text-4xl font-bold text-[#134e4a]">Panorama da imobiliaria</h1>
+            <h1 className="font-display mt-2 text-4xl font-bold text-[#0f2447]">Panorama da imobiliaria</h1>
             <p className="mt-3 max-w-3xl text-[#475569]">
               Acompanhe estoque, demanda, conversao e proximas acoes comerciais em uma tela densa para uso diario.
             </p>
           </div>
-          <div className="rounded-lg bg-[#f0fdfa] px-4 py-3 text-sm font-bold text-[#0f766e]">
+          <div className="rounded-lg bg-[#f0f4ff] px-4 py-3 text-sm font-bold text-[#1d4ed8]">
             Atualizado em tempo real pelo Firestore
           </div>
         </div>
@@ -115,11 +115,11 @@ export function AdminDashboard() {
 
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {statCards.map((stat) => (
-          <div key={stat.name} className="rounded-lg border border-[#99f6e4] bg-white p-5 shadow-sm">
+          <div key={stat.name} className="rounded-lg border border-[#bfdbfe] bg-white p-5 shadow-sm">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-sm font-bold text-[#64748b]">{stat.name}</p>
-                <h2 className="mt-2 text-4xl font-bold text-[#134e4a]">{stat.value}</h2>
+                <h2 className="mt-2 text-4xl font-bold text-[#0f2447]">{stat.value}</h2>
                 <p className="mt-1 text-sm font-semibold text-[#475569]">{stat.desc}</p>
               </div>
               <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${stat.color}`}>
@@ -131,13 +131,13 @@ export function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_0.75fr]">
-        <section className="rounded-lg border border-[#99f6e4] bg-white p-6 shadow-sm">
+        <section className="rounded-lg border border-[#bfdbfe] bg-white p-6 shadow-sm">
           <div className="mb-5 flex items-center justify-between gap-3">
             <div>
-              <h2 className="text-xl font-bold text-[#134e4a]">Acoes rapidas</h2>
+              <h2 className="text-xl font-bold text-[#0f2447]">Acoes rapidas</h2>
               <p className="text-sm text-[#64748b]">Atalhos para as rotinas que movimentam venda.</p>
             </div>
-            <Clock3 className="h-6 w-6 text-[#0f766e]" />
+            <Clock3 className="h-6 w-6 text-[#1d4ed8]" />
           </div>
 
           <div className="grid gap-3">
@@ -161,21 +161,21 @@ export function AdminDashboard() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="focus-ring flex items-center justify-between gap-4 rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-4 transition-colors duration-200 hover:border-[#14b8a6] hover:bg-[#f0fdfa]"
+                className="focus-ring flex items-center justify-between gap-4 rounded-lg border border-[#dbeafe] bg-[#f8fafc] p-4 transition-colors duration-200 hover:border-[#2563eb] hover:bg-[#f0f4ff]"
               >
                 <div>
-                  <h3 className="font-bold text-[#134e4a]">{item.title}</h3>
+                  <h3 className="font-bold text-[#0f2447]">{item.title}</h3>
                   <p className="mt-1 text-sm text-[#64748b]">{item.desc}</p>
                 </div>
-                <ArrowUpRight className="h-5 w-5 shrink-0 text-[#0f766e]" />
+                <ArrowUpRight className="h-5 w-5 shrink-0 text-[#1d4ed8]" />
               </Link>
             ))}
           </div>
         </section>
 
-        <section className="rounded-lg border border-[#99f6e4] bg-[#134e4a] p-6 text-white shadow-sm">
+        <section className="rounded-lg border border-[#bfdbfe] bg-[#0f2447] p-6 text-white shadow-sm">
           <h2 className="text-xl font-bold">Saude do funil</h2>
-          <p className="mt-2 text-[#ccfbf1]">Use como leitura rapida antes da reuniao comercial.</p>
+          <p className="mt-2 text-[#dbeafe]">Use como leitura rapida antes da reuniao comercial.</p>
 
           <div className="mt-6 space-y-4">
             {[
@@ -189,7 +189,7 @@ export function AdminDashboard() {
                   <span>{value}</span>
                 </div>
                 <div className="h-2 rounded-full bg-white/15">
-                  <div className="h-2 rounded-full bg-[#14b8a6]" style={{ width: `${width}%` }} />
+                  <div className="h-2 rounded-full bg-[#2563eb]" style={{ width: `${width}%` }} />
                 </div>
               </div>
             ))}

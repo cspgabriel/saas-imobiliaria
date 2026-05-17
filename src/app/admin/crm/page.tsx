@@ -30,7 +30,7 @@ const STATUSES = ["NOVO", "CONTATO", "VISITA", "PROPOSTA", "GANHO", "PERDIDO"];
 
 const STATUS_COLORS: Record<string, string> = {
   NOVO: "bg-[#dbeafe] text-[#0369a1]",
-  CONTATO: "bg-[#ccfbf1] text-[#0f766e]",
+  CONTATO: "bg-[#dbeafe] text-[#1d4ed8]",
   VISITA: "bg-[#fef3c7] text-[#b45309]",
   PROPOSTA: "bg-[#ffedd5] text-[#c2410c]",
   GANHO: "bg-[#dcfce7] text-[#15803d]",
@@ -164,24 +164,24 @@ export function CRM() {
     [leads]
   );
 
-  if (agencyLoading) return <div className="p-6 text-lg font-bold text-[#0f766e]">Carregando...</div>;
+  if (agencyLoading) return <div className="p-6 text-lg font-bold text-[#1d4ed8]">Carregando...</div>;
 
   return (
-    <div className="flex h-full min-h-[720px] bg-[#f0fdfa]">
+    <div className="flex h-full min-h-[720px] bg-[#f0f4ff]">
       <section className={cn("flex min-w-0 flex-1 flex-col p-4 sm:p-6", selectedLead ? "hidden lg:flex lg:max-w-[470px]" : "w-full")}>
-        <div className="mb-5 rounded-lg border border-[#99f6e4] bg-white p-5 shadow-sm">
+        <div className="mb-5 rounded-lg border border-[#bfdbfe] bg-white p-5 shadow-sm">
           <p className="text-sm font-bold text-[#0369a1]">Pipeline comercial</p>
-          <h1 className="font-display mt-2 text-3xl font-bold text-[#134e4a]">CRM de vendas</h1>
+          <h1 className="font-display mt-2 text-3xl font-bold text-[#0f2447]">CRM de vendas</h1>
           <p className="mt-2 text-sm leading-6 text-[#64748b]">Atenda novos contatos, registre interacoes e avance o lead no funil.</p>
         </div>
 
         <div className="mb-4 grid grid-cols-3 gap-2 sm:grid-cols-6">
           {pipelineCounts.map((item) => (
-            <div key={item.status} className="rounded-lg border border-[#ccfbf1] bg-white p-3 text-center">
+            <div key={item.status} className="rounded-lg border border-[#dbeafe] bg-white p-3 text-center">
               <span className={cn("mx-auto mb-2 inline-flex rounded-lg px-2 py-1 text-[11px] font-bold", STATUS_COLORS[item.status])}>
                 {item.status}
               </span>
-              <strong className="block text-xl text-[#134e4a]">{item.count}</strong>
+              <strong className="block text-xl text-[#0f2447]">{item.count}</strong>
             </div>
           ))}
         </div>
@@ -192,7 +192,7 @@ export function CRM() {
           <input
             type="search"
             placeholder="Buscar lead, email, telefone ou imovel"
-            className="focus-ring w-full rounded-lg border border-[#99f6e4] bg-white py-4 pl-12 pr-4 text-[#134e4a] placeholder:text-[#64748b] shadow-sm"
+            className="focus-ring w-full rounded-lg border border-[#bfdbfe] bg-white py-4 pl-12 pr-4 text-[#0f2447] placeholder:text-[#64748b] shadow-sm"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -209,13 +209,13 @@ export function CRM() {
                 if (event.key === "Enter" || event.key === " ") setSelectedLead(lead);
               }}
               className={cn(
-                "focus-ring w-full rounded-lg border bg-white p-4 text-left shadow-sm transition-colors duration-200 hover:border-[#14b8a6]",
-                selectedLead?.id === lead.id ? "border-[#14b8a6] bg-[#f0fdfa]" : "border-[#99f6e4]"
+                "focus-ring w-full rounded-lg border bg-white p-4 text-left shadow-sm transition-colors duration-200 hover:border-[#2563eb]",
+                selectedLead?.id === lead.id ? "border-[#2563eb] bg-[#f0f4ff]" : "border-[#bfdbfe]"
               )}
             >
               <div className="mb-3 flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <h2 className="truncate text-lg font-bold text-[#134e4a]">{lead.name}</h2>
+                  <h2 className="truncate text-lg font-bold text-[#0f2447]">{lead.name}</h2>
                   <p className="truncate text-sm text-[#64748b]">{lead.email}</p>
                 </div>
                 <span className={cn("shrink-0 rounded-lg px-2 py-1 text-[11px] font-bold", STATUS_COLORS[lead.status] || STATUS_COLORS.PERDIDO)}>
@@ -223,12 +223,12 @@ export function CRM() {
                 </span>
               </div>
               {lead.propertyTitle && (
-                <div className="mb-3 flex items-center gap-2 rounded-lg bg-[#ccfbf1] p-3 text-sm font-bold text-[#0f766e]">
+                <div className="mb-3 flex items-center gap-2 rounded-lg bg-[#dbeafe] p-3 text-sm font-bold text-[#1d4ed8]">
                   <Home className="h-4 w-4 shrink-0" />
                   <span className="truncate">{lead.propertyTitle}</span>
                 </div>
               )}
-              <div className="flex items-center gap-3 border-t border-[#ccfbf1] pt-3 text-xs font-semibold text-[#64748b]">
+              <div className="flex items-center gap-3 border-t border-[#dbeafe] pt-3 text-xs font-semibold text-[#64748b]">
                 <span className="flex items-center gap-1.5">
                   <Clock className="h-4 w-4" />
                   {formatDistanceToNow(new Date(lead.createdAt), { addSuffix: true, locale: ptBR })}
@@ -249,7 +249,7 @@ export function CRM() {
             </div>
           ))}
           {filteredLeads.length === 0 && (
-            <div className="rounded-lg border border-[#99f6e4] bg-white p-8 text-center text-sm font-bold text-[#64748b]">
+            <div className="rounded-lg border border-[#bfdbfe] bg-white p-8 text-center text-sm font-bold text-[#64748b]">
               Nenhum lead encontrado
             </div>
           )}
@@ -257,30 +257,30 @@ export function CRM() {
       </section>
 
       {selectedLead ? (
-        <section className="absolute inset-0 z-20 flex flex-1 flex-col border-l border-[#99f6e4] bg-white lg:relative lg:z-auto">
-          <div className="shrink-0 border-b border-[#ccfbf1] bg-white p-5">
+        <section className="absolute inset-0 z-20 flex flex-1 flex-col border-l border-[#bfdbfe] bg-white lg:relative lg:z-auto">
+          <div className="shrink-0 border-b border-[#dbeafe] bg-white p-5">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
-                <button className="focus-ring mb-4 rounded-lg border border-[#99f6e4] px-3 py-2 text-sm font-bold text-[#0f766e] hover:bg-[#ccfbf1] lg:hidden" onClick={() => setSelectedLead(null)}>
+                <button className="focus-ring mb-4 rounded-lg border border-[#bfdbfe] px-3 py-2 text-sm font-bold text-[#1d4ed8] hover:bg-[#dbeafe] lg:hidden" onClick={() => setSelectedLead(null)}>
                   Voltar a lista
                 </button>
                 <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[#0f766e] text-xl font-bold text-white">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[#1d4ed8] text-xl font-bold text-white">
                     {selectedLead.name.charAt(0).toUpperCase()}
                   </div>
                   <div className="min-w-0">
-                    <h2 className="truncate text-2xl font-bold text-[#134e4a]">{selectedLead.name}</h2>
+                    <h2 className="truncate text-2xl font-bold text-[#0f2447]">{selectedLead.name}</h2>
                     <p className="text-sm text-[#64748b]">Cadastrado em {format(new Date(selectedLead.createdAt), "dd 'de' MMMM, yyyy", { locale: ptBR })}</p>
                   </div>
                 </div>
               </div>
-              <button onClick={() => setSelectedLead(null)} className="focus-ring hidden rounded-lg p-2 text-[#64748b] hover:bg-[#ccfbf1] lg:inline-flex" aria-label="Fechar">
+              <button onClick={() => setSelectedLead(null)} className="focus-ring hidden rounded-lg p-2 text-[#64748b] hover:bg-[#dbeafe] lg:inline-flex" aria-label="Fechar">
                 <X className="h-5 w-5" />
               </button>
             </div>
           </div>
 
-          <div className="min-h-0 flex-1 overflow-y-auto bg-[#f0fdfa] p-4 sm:p-6">
+          <div className="min-h-0 flex-1 overflow-y-auto bg-[#f0f4ff] p-4 sm:p-6">
             <div className="grid gap-4 xl:grid-cols-[0.85fr_1fr]">
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
@@ -294,15 +294,15 @@ export function CRM() {
                   </button>
                 </div>
 
-                <div className="rounded-lg border border-[#99f6e4] bg-white p-5 shadow-sm">
+                <div className="rounded-lg border border-[#bfdbfe] bg-white p-5 shadow-sm">
                   <h3 className="mb-4 text-sm font-bold text-[#0369a1]">Informacoes do lead</h3>
                   <div className="grid gap-4">
-                    <label className="grid gap-2 text-sm font-bold text-[#134e4a]">
+                    <label className="grid gap-2 text-sm font-bold text-[#0f2447]">
                       Status do funil
                       <select
                         value={selectedLead.status}
                         onChange={(e) => handleStatusChange(selectedLead.id, e.target.value)}
-                        className="focus-ring rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-3"
+                        className="focus-ring rounded-lg border border-[#dbeafe] bg-[#f8fafc] p-3"
                       >
                         {STATUSES.map((status) => (
                           <option key={status} value={status}>
@@ -314,24 +314,24 @@ export function CRM() {
                     <div className="grid gap-3 sm:grid-cols-2">
                       <div className="rounded-lg bg-[#f8fafc] p-3">
                         <span className="text-xs font-bold text-[#64748b]">Telefone</span>
-                        <p className="mt-1 font-mono text-sm font-bold text-[#134e4a]">{selectedLead.phone || "-"}</p>
+                        <p className="mt-1 font-mono text-sm font-bold text-[#0f2447]">{selectedLead.phone || "-"}</p>
                       </div>
                       <div className="rounded-lg bg-[#f8fafc] p-3">
                         <span className="text-xs font-bold text-[#64748b]">Email</span>
-                        <p className="mt-1 truncate text-sm font-bold text-[#134e4a]">{selectedLead.email || "-"}</p>
+                        <p className="mt-1 truncate text-sm font-bold text-[#0f2447]">{selectedLead.email || "-"}</p>
                       </div>
                     </div>
                     {selectedLead.propertyTitle && (
-                      <div className="rounded-lg bg-[#ccfbf1] p-3">
-                        <span className="text-xs font-bold text-[#0f766e]">Imovel de interesse</span>
-                        <p className="mt-1 font-bold text-[#134e4a]">{selectedLead.propertyTitle}</p>
+                      <div className="rounded-lg bg-[#dbeafe] p-3">
+                        <span className="text-xs font-bold text-[#1d4ed8]">Imovel de interesse</span>
+                        <p className="mt-1 font-bold text-[#0f2447]">{selectedLead.propertyTitle}</p>
                       </div>
                     )}
                   </div>
                 </div>
               </div>
 
-              <div className="rounded-lg border border-[#99f6e4] bg-white p-5 shadow-sm">
+              <div className="rounded-lg border border-[#bfdbfe] bg-white p-5 shadow-sm">
                 <h3 className="mb-4 text-sm font-bold text-[#0369a1]">Historico e anotacoes</h3>
                 <div className="max-h-[460px] space-y-4 overflow-y-auto pr-1">
                   {interactions.map((interaction) => (
@@ -348,7 +348,7 @@ export function CRM() {
                       >
                         {interaction.type === "WHATSAPP" ? <MessageCircle className="h-4 w-4" /> : interaction.type === "EMAIL" ? <Mail className="h-4 w-4" /> : <FileText className="h-4 w-4" />}
                       </div>
-                      <div className="min-w-0 flex-1 rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-3">
+                      <div className="min-w-0 flex-1 rounded-lg border border-[#dbeafe] bg-[#f8fafc] p-3">
                         <div className="mb-2 flex flex-wrap justify-between gap-2 text-xs font-bold text-[#64748b]">
                           <span>{interaction.performedBy}</span>
                           <span>{format(new Date(interaction.createdAt), "dd/MM 'as' HH:mm")}</span>
@@ -361,16 +361,16 @@ export function CRM() {
                 </div>
 
                 <form onSubmit={submitNote} className="mt-4 grid gap-3">
-                  <label className="grid gap-2 text-sm font-bold text-[#134e4a]">
+                  <label className="grid gap-2 text-sm font-bold text-[#0f2447]">
                     Nova nota
                     <textarea
                       value={newNote}
                       onChange={(e) => setNewNote(e.target.value)}
                       placeholder="Registrar contexto do atendimento..."
-                      className="focus-ring min-h-24 resize-none rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-3 text-[#134e4a] placeholder:text-[#64748b]"
+                      className="focus-ring min-h-24 resize-none rounded-lg border border-[#dbeafe] bg-[#f8fafc] p-3 text-[#0f2447] placeholder:text-[#64748b]"
                     />
                   </label>
-                  <button type="submit" className="focus-ring justify-self-end rounded-lg bg-[#0f766e] px-5 py-3 font-bold text-white shadow-sm hover:bg-[#115e59]">
+                  <button type="submit" className="focus-ring justify-self-end rounded-lg bg-[#1d4ed8] px-5 py-3 font-bold text-white shadow-sm hover:bg-[#115e59]">
                     Salvar nota
                   </button>
                 </form>
@@ -379,10 +379,10 @@ export function CRM() {
           </div>
         </section>
       ) : (
-        <section className="hidden flex-1 items-center justify-center border-l border-[#99f6e4] bg-white p-8 text-center lg:flex">
+        <section className="hidden flex-1 items-center justify-center border-l border-[#bfdbfe] bg-white p-8 text-center lg:flex">
           <div>
             <UsersFallback />
-            <h2 className="mt-4 text-2xl font-bold text-[#134e4a]">Selecione um lead</h2>
+            <h2 className="mt-4 text-2xl font-bold text-[#0f2447]">Selecione um lead</h2>
             <p className="mt-2 max-w-md text-[#64748b]">Abra um contato para registrar status, WhatsApp, email e anotacoes do atendimento.</p>
           </div>
         </section>
@@ -393,7 +393,7 @@ export function CRM() {
 
 function UsersFallback() {
   return (
-    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-lg bg-[#ccfbf1] text-[#0f766e]">
+    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-lg bg-[#dbeafe] text-[#1d4ed8]">
       <Search className="h-7 w-7" />
     </div>
   );
