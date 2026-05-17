@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { User, Mail, MessageCircle, Phone, Clock, Plus, Trash2, X, Search, FileText } from "lucide-react";
+import React, { useEffect, useMemo, useState } from "react";
+import { Clock, FileText, Home, Mail, MessageCircle, Search, Trash2, X } from "lucide-react";
 import { cn } from "../../../lib/utils";
 import { format, formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { collection, query, onSnapshot, deleteDoc, doc, setDoc, Timestamp, orderBy, addDoc, updateDoc } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, onSnapshot, orderBy, query, Timestamp, updateDoc } from "firebase/firestore";
 import { db, handleFirestoreError, OperationType } from "../../../lib/firebase";
 import { useAgency } from "../../../lib/AgencyContext";
 import { useAuth } from "../../../lib/AuthContext";
@@ -26,6 +26,17 @@ type Interaction = {
   createdAt: string;
 };
 
+const STATUSES = ["NOVO", "CONTATO", "VISITA", "PROPOSTA", "GANHO", "PERDIDO"];
+
+const STATUS_COLORS: Record<string, string> = {
+  NOVO: "bg-[#dbeafe] text-[#0369a1]",
+  CONTATO: "bg-[#ccfbf1] text-[#0f766e]",
+  VISITA: "bg-[#fef3c7] text-[#b45309]",
+  PROPOSTA: "bg-[#ffedd5] text-[#c2410c]",
+  GANHO: "bg-[#dcfce7] text-[#15803d]",
+  PERDIDO: "bg-[#e2e8f0] text-[#475569]",
+};
+
 export function CRM() {
   const { agency, loading: agencyLoading } = useAgency();
   const { profile } = useAuth();
@@ -38,29 +49,38 @@ export function CRM() {
   useEffect(() => {
     if (!agency) return;
     const q = query(collection(db, "agencies", agency.id, "leads"), orderBy("updatedAt", "desc"));
-    const unsub = onSnapshot(q, (snap) => {
-      setLeads(snap.docs.map(d => ({
-        id: d.id,
-        ...d.data(),
-        createdAt: d.data().createdAt?.toDate?.()?.toISOString() || new Date().toISOString()
-      })) as Lead[]);
-    }, (err) => handleFirestoreError(err, OperationType.LIST, `agencies/${agency.id}/leads`));
+    const unsub = onSnapshot(
+      q,
+      (snap) => {
+        setLeads(
+          snap.docs.map((item) => ({
+            id: item.id,
+            ...item.data(),
+            createdAt: item.data().createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+          })) as Lead[]
+        );
+      },
+      (err) => handleFirestoreError(err, OperationType.LIST, `agencies/${agency.id}/leads`)
+    );
     return unsub;
   }, [agency]);
 
   useEffect(() => {
     if (!agency || !selectedLead) return;
-    const q = query(
-      collection(db, "agencies", agency.id, "leads", selectedLead.id, "interactions"), 
-      orderBy("createdAt", "desc")
+    const q = query(collection(db, "agencies", agency.id, "leads", selectedLead.id, "interactions"), orderBy("createdAt", "desc"));
+    const unsub = onSnapshot(
+      q,
+      (snap) => {
+        setInteractions(
+          snap.docs.map((item) => ({
+            id: item.id,
+            ...item.data(),
+            createdAt: item.data().createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+          })) as Interaction[]
+        );
+      },
+      (err) => handleFirestoreError(err, OperationType.LIST, "interactions")
     );
-    const unsub = onSnapshot(q, (snap) => {
-      setInteractions(snap.docs.map(d => ({
-        id: d.id,
-        ...d.data(),
-        createdAt: d.data().createdAt?.toDate?.()?.toISOString() || new Date().toISOString()
-      })) as Interaction[]);
-    }, (err) => handleFirestoreError(err, OperationType.LIST, `interactions`));
     return unsub;
   }, [agency, selectedLead]);
 
@@ -71,243 +91,310 @@ export function CRM() {
         type,
         content,
         performedBy: profile.name || profile.email,
-        createdAt: Timestamp.now()
+        createdAt: Timestamp.now(),
       });
       await updateDoc(doc(db, "agencies", agency.id, "leads", selectedLead.id), { updatedAt: Timestamp.now() });
     } catch (err) {
-      handleFirestoreError(err, OperationType.WRITE, `interactions`);
+      handleFirestoreError(err, OperationType.WRITE, "interactions");
     }
   };
 
   const handleStatusChange = async (leadId: string, newStatus: string) => {
     if (!agency) return;
     try {
-      await updateDoc(doc(db, "agencies", agency.id, "leads", leadId), { 
+      await updateDoc(doc(db, "agencies", agency.id, "leads", leadId), {
         status: newStatus,
-        updatedAt: Timestamp.now() 
+        updatedAt: Timestamp.now(),
       });
-    } catch(err) {
-      handleFirestoreError(err, OperationType.UPDATE, `leads`);
+      if (selectedLead?.id === leadId) setSelectedLead({ ...selectedLead, status: newStatus });
+    } catch (err) {
+      handleFirestoreError(err, OperationType.UPDATE, "leads");
     }
   };
 
-  const handleDelete = async (id: string, e: React.MouseEvent) => {
+  const handleDelete = async (id: string, e: React.MouseEvent | React.KeyboardEvent) => {
     e.stopPropagation();
     if (!agency) return;
     if (!confirm("Tem certeza que deseja excluir o lead?")) return;
     try {
       await deleteDoc(doc(db, "agencies", agency.id, "leads", id));
       if (selectedLead?.id === id) setSelectedLead(null);
-    } catch(err) {
-      handleFirestoreError(err, OperationType.DELETE, `leads`);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.DELETE, "leads");
     }
   };
 
   const handleWhatsAppClick = (lead: Lead) => {
-    if(!lead.phone) return alert("Lead não possui telefone cadastrado.");
-    const wpUrl = `https://wa.me/${lead.phone.replace(/\D/g,'')}?text=Olá ${lead.name}, vi seu interesse no imóvel ${lead.propertyTitle || ''}. Como posso ajudar?`;
-    window.open(wpUrl, '_blank');
-    logInteraction('WHATSAPP', `Enviou mensagem no WhatsApp inicializando atendimento.`);
+    if (!lead.phone) return alert("Lead nao possui telefone cadastrado.");
+    const wpUrl = `https://wa.me/${lead.phone.replace(/\D/g, "")}?text=Ola ${lead.name}, vi seu interesse no imovel ${lead.propertyTitle || ""}. Como posso ajudar?`;
+    window.open(wpUrl, "_blank");
+    logInteraction("WHATSAPP", "Iniciou atendimento pelo WhatsApp.");
   };
 
   const handleEmailClick = (lead: Lead) => {
-    if(!lead.email) return alert("Lead não possui email cadastrado.");
-    const subject = encodeURIComponent(`Contato sobre o imóvel ${lead.propertyTitle || ''}`);
-    const body = encodeURIComponent(`Olá ${lead.name},\n\nRecebemos seu contato através do nosso site referente ao imóvel ${lead.propertyTitle || ''}.\n\n`);
-    window.open(`mailto:${lead.email}?subject=${subject}&body=${body}`, '_blank');
-    logInteraction('EMAIL', `Iniciou rascunho de E-mail via Mailto.`);
+    if (!lead.email) return alert("Lead nao possui email cadastrado.");
+    const subject = encodeURIComponent(`Contato sobre o imovel ${lead.propertyTitle || ""}`);
+    const body = encodeURIComponent(`Ola ${lead.name},\n\nRecebemos seu contato atraves do nosso site referente ao imovel ${lead.propertyTitle || ""}.\n\n`);
+    window.open(`mailto:${lead.email}?subject=${subject}&body=${body}`, "_blank");
+    logInteraction("EMAIL", "Iniciou rascunho de email via mailto.");
   };
 
   const submitNote = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newNote.trim()) return;
-    logInteraction('NOTE', newNote.trim());
+    logInteraction("NOTE", newNote.trim());
     setNewNote("");
   };
 
-  if (agencyLoading) return <div className="p-8">Carregando...</div>;
+  const filteredLeads = useMemo(() => {
+    const normalizedTerm = searchTerm.toLowerCase();
+    return leads.filter((lead) =>
+      [lead.name, lead.email, lead.phone, lead.propertyTitle].some((value) =>
+        value?.toLowerCase().includes(normalizedTerm)
+      )
+    );
+  }, [leads, searchTerm]);
 
-  const STATUSES = ["NOVO", "CONTATO", "VISITA", "PROPOSTA", "GANHO", "PERDIDO"];
-  const STATUS_COLORS: Record<string, string> = {
-    NOVO: "bg-blue-100 text-blue-800",
-    CONTATO: "bg-purple-100 text-purple-800",
-    VISITA: "bg-amber-100 text-amber-800",
-    PROPOSTA: "bg-orange-100 text-orange-800",
-    GANHO: "bg-emerald-100 text-emerald-800",
-    PERDIDO: "bg-slate-100 text-slate-800"
-  };
+  const pipelineCounts = useMemo(
+    () =>
+      STATUSES.map((status) => ({
+        status,
+        count: leads.filter((lead) => lead.status === status).length,
+      })),
+    [leads]
+  );
 
-  const filteredLeads = leads.filter(l => l.name.toLowerCase().includes(searchTerm.toLowerCase()) || l.email.toLowerCase().includes(searchTerm.toLowerCase()));
+  if (agencyLoading) return <div className="p-6 text-lg font-bold text-[#0f766e]">Carregando...</div>;
 
   return (
-    <div className="flex bg-slate-50 relative h-full">
-      {/* List Column */}
-      <div className={cn("flex-1 p-6 transition-all", selectedLead ? "hidden md:block md:w-1/2 lg:w-1/3" : "w-full")}>
-        <div className="mb-6">
-          <h2 className="text-2xl font-black text-slate-900 tracking-tight mb-2">CRM de Vendas</h2>
-          <p className="text-slate-500 font-medium text-sm">Gerencie os contatos e interessados nos imóveis.</p>
+    <div className="flex h-full min-h-[720px] bg-[#f0fdfa]">
+      <section className={cn("flex min-w-0 flex-1 flex-col p-4 sm:p-6", selectedLead ? "hidden lg:flex lg:max-w-[470px]" : "w-full")}>
+        <div className="mb-5 rounded-lg border border-[#99f6e4] bg-white p-5 shadow-sm">
+          <p className="text-sm font-bold text-[#0369a1]">Pipeline comercial</p>
+          <h1 className="font-display mt-2 text-3xl font-bold text-[#134e4a]">CRM de vendas</h1>
+          <p className="mt-2 text-sm leading-6 text-[#64748b]">Atenda novos contatos, registre interacoes e avance o lead no funil.</p>
         </div>
 
-        <div className="relative mb-6">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input 
-            type="text" 
-            placeholder="Buscar lead..." 
-            className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+        <div className="mb-4 grid grid-cols-3 gap-2 sm:grid-cols-6">
+          {pipelineCounts.map((item) => (
+            <div key={item.status} className="rounded-lg border border-[#ccfbf1] bg-white p-3 text-center">
+              <span className={cn("mx-auto mb-2 inline-flex rounded-lg px-2 py-1 text-[11px] font-bold", STATUS_COLORS[item.status])}>
+                {item.status}
+              </span>
+              <strong className="block text-xl text-[#134e4a]">{item.count}</strong>
+            </div>
+          ))}
+        </div>
+
+        <label className="relative mb-4 block">
+          <span className="sr-only">Buscar lead</span>
+          <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#64748b]" />
+          <input
+            type="search"
+            placeholder="Buscar lead, email, telefone ou imovel"
+            className="focus-ring w-full rounded-lg border border-[#99f6e4] bg-white py-4 pl-12 pr-4 text-[#134e4a] placeholder:text-[#64748b] shadow-sm"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-        </div>
+        </label>
 
-        <div className="space-y-3 pb-32">
-          {filteredLeads.map(lead => (
-            <div 
-              key={lead.id} 
+        <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pb-24">
+          {filteredLeads.map((lead) => (
+            <div
+              key={lead.id}
+              role="button"
+              tabIndex={0}
               onClick={() => setSelectedLead(lead)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") setSelectedLead(lead);
+              }}
               className={cn(
-                "p-4 rounded-xl border cursor-pointer transition-all hover:border-blue-300 hover:shadow-md",
-                selectedLead?.id === lead.id ? "bg-blue-50 border-blue-400 shadow-sm" : "bg-white border-slate-200 shadow-sm"
+                "focus-ring w-full rounded-lg border bg-white p-4 text-left shadow-sm transition-colors duration-200 hover:border-[#14b8a6]",
+                selectedLead?.id === lead.id ? "border-[#14b8a6] bg-[#f0fdfa]" : "border-[#99f6e4]"
               )}
             >
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="font-bold text-slate-900 text-lg line-clamp-1">{lead.name}</h3>
-                <span className={cn("text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wide", STATUS_COLORS[lead.status] || "bg-slate-100 text-slate-600")}>
+              <div className="mb-3 flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <h2 className="truncate text-lg font-bold text-[#134e4a]">{lead.name}</h2>
+                  <p className="truncate text-sm text-[#64748b]">{lead.email}</p>
+                </div>
+                <span className={cn("shrink-0 rounded-lg px-2 py-1 text-[11px] font-bold", STATUS_COLORS[lead.status] || STATUS_COLORS.PERDIDO)}>
                   {lead.status}
                 </span>
               </div>
               {lead.propertyTitle && (
-                <div className="text-sm font-medium text-blue-600 mb-2 line-clamp-1 bg-blue-100/50 p-2 rounded-lg break-all">
-                  🏡 {lead.propertyTitle}
+                <div className="mb-3 flex items-center gap-2 rounded-lg bg-[#ccfbf1] p-3 text-sm font-bold text-[#0f766e]">
+                  <Home className="h-4 w-4 shrink-0" />
+                  <span className="truncate">{lead.propertyTitle}</span>
                 </div>
               )}
-              <div className="flex items-center gap-4 text-xs font-medium text-slate-500 mt-3 pt-3 border-t border-slate-100">
-                <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {formatDistanceToNow(new Date(lead.createdAt), { addSuffix: true, locale: ptBR })}</span>
-                <button onClick={(e) => handleDelete(lead.id, e)} className="ml-auto text-red-500 hover:text-red-700 bg-red-50 p-1.5 rounded-md"><Trash2 className="w-3.5 h-3.5" /></button>
+              <div className="flex items-center gap-3 border-t border-[#ccfbf1] pt-3 text-xs font-semibold text-[#64748b]">
+                <span className="flex items-center gap-1.5">
+                  <Clock className="h-4 w-4" />
+                  {formatDistanceToNow(new Date(lead.createdAt), { addSuffix: true, locale: ptBR })}
+                </span>
+                <span className="ml-auto rounded-lg bg-[#f8fafc] px-2 py-1">{lead.phone || "sem telefone"}</span>
+                <button
+                  type="button"
+                  onClick={(event) => handleDelete(lead.id, event)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") handleDelete(lead.id, event);
+                  }}
+                  className="focus-ring rounded-lg p-2 text-[#dc2626] hover:bg-[#fee2e2]"
+                  aria-label="Excluir lead"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
               </div>
             </div>
           ))}
-          {filteredLeads.length === 0 && <div className="text-center p-8 text-slate-500 text-sm font-medium">Nenhum lead encontrado</div>}
+          {filteredLeads.length === 0 && (
+            <div className="rounded-lg border border-[#99f6e4] bg-white p-8 text-center text-sm font-bold text-[#64748b]">
+              Nenhum lead encontrado
+            </div>
+          )}
         </div>
-      </div>
+      </section>
 
-      {/* Detail Column */}
-      {selectedLead && (
-        <div className="flex-1 bg-white border-l border-slate-200 h-[calc(100vh-64px)] overflow-y-auto sticky top-0 flex flex-col z-20 absolute inset-0 md:relative w-full">
-          {/* Detail Header */}
-          <div className="p-6 border-b border-slate-100 bg-white sticky top-0 z-10 flex items-start justify-between">
-            <div>
-              <button className="md:hidden mb-4 text-slate-500 font-bold text-sm bg-slate-100 px-3 py-1.5 rounded-lg flex items-center gap-1" onClick={() => setSelectedLead(null)}>
-                Voltar à lista
-              </button>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-black text-xl">
-                  {selectedLead.name.charAt(0).toUpperCase()}
-                </div>
-                <div>
-                  <h2 className="text-2xl font-black text-slate-900">{selectedLead.name}</h2>
-                  <p className="text-slate-500 text-sm font-medium">Cadastrado em {format(new Date(selectedLead.createdAt), "dd 'de' MMMM, yyyy", { locale: ptBR })}</p>
-                </div>
-              </div>
-            </div>
-            <button onClick={() => setSelectedLead(null)} className="hidden md:flex p-2 text-slate-400 hover:bg-slate-100 rounded-full transition-colors">
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          <div className="p-6 flex-1 flex flex-col gap-6 bg-slate-50">
-            {/* Quick Actions */}
-            <div className="grid grid-cols-2 gap-3">
-              <button onClick={() => handleWhatsAppClick(selectedLead)} className="flex flex-col items-center justify-center gap-2 bg-[#25D366] hover:bg-[#1EBE5D] text-white p-4 rounded-2xl font-bold shadow-lg shadow-green-500/20 transition-transform active:scale-95">
-                <MessageCircle className="w-6 h-6" />
-                WhatsApp
-              </button>
-              <button onClick={() => handleEmailClick(selectedLead)} className="flex flex-col items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-2xl font-bold shadow-lg shadow-blue-500/20 transition-transform active:scale-95">
-                <Mail className="w-6 h-6" />
-                E-mail
-              </button>
-            </div>
-
-            {/* Status & Info */}
-            <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Informações do Lead</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-xs font-bold text-slate-500 mb-1 block">Status do Funil</label>
-                  <select 
-                    value={selectedLead.status} 
-                    onChange={(e) => handleStatusChange(selectedLead.id, e.target.value)}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-slate-800"
-                  >
-                    {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-                  </select>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-bold text-slate-500 mb-1 block">Telefone</label>
-                    <div className="font-mono text-sm font-medium text-slate-800 bg-slate-50 p-2.5 rounded-lg border border-slate-100">{selectedLead.phone || '-'}</div>
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-slate-500 mb-1 block">Email</label>
-                    <div className="text-sm font-medium text-slate-800 bg-slate-50 p-2.5 rounded-lg border border-slate-100 overflow-hidden text-ellipsis">{selectedLead.email || '-'}</div>
-                  </div>
-                </div>
-
-                {selectedLead.propertyTitle && (
-                  <div>
-                    <label className="text-xs font-bold text-slate-500 mb-1 block">Imóvel de Interesse</label>
-                    <div className="text-sm font-bold text-blue-700 bg-blue-50 p-3 rounded-xl border border-blue-100">{selectedLead.propertyTitle}</div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Interaction History */}
-            <div className="bg-white flex-1 p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col">
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Histórico & Anotações</h3>
-              
-              <div className="flex-1 overflow-y-auto pr-2 space-y-4 mb-4">
-                {interactions.map(interaction => (
-                  <div key={interaction.id} className="flex gap-3 relative">
-                    <div className="absolute left-[15px] top-6 bottom-[-20px] w-0.5 bg-slate-100 last:hidden"></div>
-                    <div className={cn(
-                      "w-8 h-8 rounded-full flex items-center justify-center shrink-0 z-10 shadow-sm",
-                      interaction.type === 'WHATSAPP' ? "bg-green-100 text-green-600" :
-                      interaction.type === 'EMAIL' ? "bg-blue-100 text-blue-600" :
-                      "bg-amber-100 text-amber-600"
-                    )}>
-                      {interaction.type === 'WHATSAPP' ? <MessageCircle className="w-4 h-4" /> :
-                       interaction.type === 'EMAIL' ? <Mail className="w-4 h-4" /> :
-                       <FileText className="w-4 h-4" />}
-                    </div>
-                    <div className="flex-1 bg-slate-50/80 p-3.5 rounded-xl border border-slate-100/50">
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="text-[10px] font-bold text-slate-400 bg-white px-2 py-0.5 rounded-md border border-slate-100">{interaction.performedBy}</span>
-                        <span className="text-[10px] font-medium text-slate-400">{format(new Date(interaction.createdAt), "dd/MM 'às' HH:mm")}</span>
-                      </div>
-                      <p className="text-sm font-medium text-slate-700 leading-relaxed whitespace-pre-wrap">{interaction.content}</p>
-                    </div>
-                  </div>
-                ))}
-                {interactions.length === 0 && <p className="text-sm text-slate-400 font-medium text-center py-4">Nenhuma interação registrada ainda.</p>}
-              </div>
-
-              <form onSubmit={submitNote} className="mt-auto relative">
-                <textarea 
-                  value={newNote}
-                  onChange={(e) => setNewNote(e.target.value)}
-                  placeholder="Adicionar nota ao histórico..."
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 pr-12 text-sm outline-none focus:ring-2 focus:ring-amber-500 font-medium text-slate-800 resize-none"
-                  rows={2}
-                />
-                <button type="submit" className="absolute right-2 bottom-2 bg-amber-500 hover:bg-amber-600 text-white p-2 text-xs font-bold rounded-lg transition-colors">
-                  Salvar
+      {selectedLead ? (
+        <section className="absolute inset-0 z-20 flex flex-1 flex-col border-l border-[#99f6e4] bg-white lg:relative lg:z-auto">
+          <div className="shrink-0 border-b border-[#ccfbf1] bg-white p-5">
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <button className="focus-ring mb-4 rounded-lg border border-[#99f6e4] px-3 py-2 text-sm font-bold text-[#0f766e] hover:bg-[#ccfbf1] lg:hidden" onClick={() => setSelectedLead(null)}>
+                  Voltar a lista
                 </button>
-              </form>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[#0f766e] text-xl font-bold text-white">
+                    {selectedLead.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="min-w-0">
+                    <h2 className="truncate text-2xl font-bold text-[#134e4a]">{selectedLead.name}</h2>
+                    <p className="text-sm text-[#64748b]">Cadastrado em {format(new Date(selectedLead.createdAt), "dd 'de' MMMM, yyyy", { locale: ptBR })}</p>
+                  </div>
+                </div>
+              </div>
+              <button onClick={() => setSelectedLead(null)} className="focus-ring hidden rounded-lg p-2 text-[#64748b] hover:bg-[#ccfbf1] lg:inline-flex" aria-label="Fechar">
+                <X className="h-5 w-5" />
+              </button>
             </div>
           </div>
-        </div>
+
+          <div className="min-h-0 flex-1 overflow-y-auto bg-[#f0fdfa] p-4 sm:p-6">
+            <div className="grid gap-4 xl:grid-cols-[0.85fr_1fr]">
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <button onClick={() => handleWhatsAppClick(selectedLead)} className="focus-ring flex items-center justify-center gap-2 rounded-lg bg-[#25D366] p-4 font-bold text-white shadow-sm hover:bg-[#1EBE5D]">
+                    <MessageCircle className="h-5 w-5" />
+                    WhatsApp
+                  </button>
+                  <button onClick={() => handleEmailClick(selectedLead)} className="focus-ring flex items-center justify-center gap-2 rounded-lg bg-[#0369a1] p-4 font-bold text-white shadow-sm hover:bg-[#075985]">
+                    <Mail className="h-5 w-5" />
+                    E-mail
+                  </button>
+                </div>
+
+                <div className="rounded-lg border border-[#99f6e4] bg-white p-5 shadow-sm">
+                  <h3 className="mb-4 text-sm font-bold text-[#0369a1]">Informacoes do lead</h3>
+                  <div className="grid gap-4">
+                    <label className="grid gap-2 text-sm font-bold text-[#134e4a]">
+                      Status do funil
+                      <select
+                        value={selectedLead.status}
+                        onChange={(e) => handleStatusChange(selectedLead.id, e.target.value)}
+                        className="focus-ring rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-3"
+                      >
+                        {STATUSES.map((status) => (
+                          <option key={status} value={status}>
+                            {status}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div className="rounded-lg bg-[#f8fafc] p-3">
+                        <span className="text-xs font-bold text-[#64748b]">Telefone</span>
+                        <p className="mt-1 font-mono text-sm font-bold text-[#134e4a]">{selectedLead.phone || "-"}</p>
+                      </div>
+                      <div className="rounded-lg bg-[#f8fafc] p-3">
+                        <span className="text-xs font-bold text-[#64748b]">Email</span>
+                        <p className="mt-1 truncate text-sm font-bold text-[#134e4a]">{selectedLead.email || "-"}</p>
+                      </div>
+                    </div>
+                    {selectedLead.propertyTitle && (
+                      <div className="rounded-lg bg-[#ccfbf1] p-3">
+                        <span className="text-xs font-bold text-[#0f766e]">Imovel de interesse</span>
+                        <p className="mt-1 font-bold text-[#134e4a]">{selectedLead.propertyTitle}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-lg border border-[#99f6e4] bg-white p-5 shadow-sm">
+                <h3 className="mb-4 text-sm font-bold text-[#0369a1]">Historico e anotacoes</h3>
+                <div className="max-h-[460px] space-y-4 overflow-y-auto pr-1">
+                  {interactions.map((interaction) => (
+                    <div key={interaction.id} className="flex gap-3">
+                      <div
+                        className={cn(
+                          "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
+                          interaction.type === "WHATSAPP"
+                            ? "bg-[#dcfce7] text-[#15803d]"
+                            : interaction.type === "EMAIL"
+                              ? "bg-[#dbeafe] text-[#0369a1]"
+                              : "bg-[#fef3c7] text-[#b45309]"
+                        )}
+                      >
+                        {interaction.type === "WHATSAPP" ? <MessageCircle className="h-4 w-4" /> : interaction.type === "EMAIL" ? <Mail className="h-4 w-4" /> : <FileText className="h-4 w-4" />}
+                      </div>
+                      <div className="min-w-0 flex-1 rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-3">
+                        <div className="mb-2 flex flex-wrap justify-between gap-2 text-xs font-bold text-[#64748b]">
+                          <span>{interaction.performedBy}</span>
+                          <span>{format(new Date(interaction.createdAt), "dd/MM 'as' HH:mm")}</span>
+                        </div>
+                        <p className="whitespace-pre-wrap text-sm leading-6 text-[#475569]">{interaction.content}</p>
+                      </div>
+                    </div>
+                  ))}
+                  {interactions.length === 0 && <p className="py-8 text-center text-sm font-bold text-[#64748b]">Nenhuma interacao registrada.</p>}
+                </div>
+
+                <form onSubmit={submitNote} className="mt-4 grid gap-3">
+                  <label className="grid gap-2 text-sm font-bold text-[#134e4a]">
+                    Nova nota
+                    <textarea
+                      value={newNote}
+                      onChange={(e) => setNewNote(e.target.value)}
+                      placeholder="Registrar contexto do atendimento..."
+                      className="focus-ring min-h-24 resize-none rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-3 text-[#134e4a] placeholder:text-[#64748b]"
+                    />
+                  </label>
+                  <button type="submit" className="focus-ring justify-self-end rounded-lg bg-[#0f766e] px-5 py-3 font-bold text-white shadow-sm hover:bg-[#115e59]">
+                    Salvar nota
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : (
+        <section className="hidden flex-1 items-center justify-center border-l border-[#99f6e4] bg-white p-8 text-center lg:flex">
+          <div>
+            <UsersFallback />
+            <h2 className="mt-4 text-2xl font-bold text-[#134e4a]">Selecione um lead</h2>
+            <p className="mt-2 max-w-md text-[#64748b]">Abra um contato para registrar status, WhatsApp, email e anotacoes do atendimento.</p>
+          </div>
+        </section>
       )}
+    </div>
+  );
+}
+
+function UsersFallback() {
+  return (
+    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-lg bg-[#ccfbf1] text-[#0f766e]">
+      <Search className="h-7 w-7" />
     </div>
   );
 }

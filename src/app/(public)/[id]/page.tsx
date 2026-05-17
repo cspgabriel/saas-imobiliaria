@@ -1,10 +1,19 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "wouter";
-import { ArrowLeft, BedDouble, Bath, Square, MapPin } from "lucide-react";
+import {
+  ArrowLeft,
+  Bath,
+  BedDouble,
+  CalendarCheck,
+  CheckCircle2,
+  MapPin,
+  MessageCircle,
+  Square,
+} from "lucide-react";
 import { cn } from "../../../lib/utils";
 import { useAgency } from "../../../lib/AgencyContext";
 import { db, handleFirestoreError, OperationType } from "../../../lib/firebase";
-import { doc, getDoc, collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, serverTimestamp } from "firebase/firestore";
 
 type Property = {
   id: string;
@@ -20,12 +29,12 @@ type Property = {
   imageUrl: string | null;
 };
 
+const fallbackImage = "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1600&q=80";
+
 export function PropertyDetail({ id }: { id: string }) {
   const { agency, loading } = useAgency();
   const [property, setProperty] = useState<Property | null>(null);
   const [propLoading, setPropLoading] = useState(true);
-  
-  // Lead Form
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -34,7 +43,7 @@ export function PropertyDetail({ id }: { id: string }) {
 
   useEffect(() => {
     if (!agency) return;
-    
+
     const fetchProperty = async () => {
       try {
         const docRef = doc(db, "agencies", agency.id, "properties", id);
@@ -51,9 +60,9 @@ export function PropertyDetail({ id }: { id: string }) {
     fetchProperty();
   }, [id, agency]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!agency) return;
+    if (!agency || !property) return;
     setIsSubmitting(true);
     try {
       await addDoc(collection(db, "agencies", agency.id, "leads"), {
@@ -61,9 +70,11 @@ export function PropertyDetail({ id }: { id: string }) {
         email,
         phone,
         propertyId: id,
+        propertyTitle: property.title,
         status: "NOVO",
-        notes: "Lead recebido via página do imóvel.",
+        notes: "Lead recebido via pagina do imovel.",
         createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
       });
       setSubmitted(true);
     } catch (error) {
@@ -73,122 +84,177 @@ export function PropertyDetail({ id }: { id: string }) {
     }
   };
 
-  if (loading || propLoading) return <div className="min-h-screen flex items-center justify-center p-8">Carregando imóvel...</div>;
-  if (!property) return <div className="min-h-screen flex items-center justify-center p-8">Imóvel não encontrado.</div>;
+  if (loading || propLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#f0fdfa] px-4 text-center text-lg font-bold text-[#0f766e]">
+        Carregando imovel...
+      </div>
+    );
+  }
+
+  if (!property) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#f0fdfa] px-4 text-center">
+        <div>
+          <h1 className="font-display text-3xl font-bold text-[#134e4a]">Imovel nao encontrado</h1>
+          <Link href="/" className="focus-ring mt-5 inline-flex rounded-lg bg-[#0369a1] px-5 py-3 font-bold text-white hover:bg-[#075985]">
+            Voltar para o site
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans pb-20">
-      {/* Header Público */}
-      <header className="bg-white border-b sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center">
-          <Link href="/" className="flex items-center gap-2 text-slate-600 hover:text-blue-600 transition-colors font-medium">
-            <ArrowLeft className="w-5 h-5" />
-            Voltar para imóveis
+    <div className="min-h-screen bg-[#f0fdfa] text-[#134e4a]">
+      <header className="sticky top-0 z-50 border-b border-[#99f6e4]/70 bg-white/90 backdrop-blur">
+        <div className="mx-auto flex h-18 max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
+          <Link href="/" className="focus-ring inline-flex items-center gap-2 rounded-lg px-3 py-2 font-bold text-[#134e4a] hover:bg-[#ccfbf1]">
+            <ArrowLeft className="h-5 w-5" />
+            Voltar para imoveis
           </Link>
+          <a href="#contato" className="focus-ring inline-flex items-center gap-2 rounded-lg bg-[#0369a1] px-4 py-3 text-sm font-bold text-white hover:bg-[#075985]">
+            Agendar visita
+            <CalendarCheck className="h-4 w-4" />
+          </a>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-12">
-        {/* Coluna Esquerda: Detalhes */}
-        <div className="lg:col-span-2 space-y-8">
-          <div className="aspect-[16/9] bg-slate-200 rounded-3xl overflow-hidden border border-slate-200 shadow-sm">
-            {property.imageUrl ? (
-              <img src={property.imageUrl} alt={property.title} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center text-slate-400">
-                Sem Galeria de Imagens
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:py-12">
+        <div className="grid gap-8 lg:grid-cols-[1fr_390px]">
+          <section className="space-y-8">
+            <div className="overflow-hidden rounded-lg border border-[#99f6e4] bg-white shadow-sm">
+              <img
+                src={property.imageUrl || fallbackImage}
+                alt={property.title}
+                className="aspect-[16/9] w-full object-cover"
+              />
+            </div>
+
+            <div className="rounded-lg border border-[#99f6e4] bg-white p-6 shadow-sm">
+              <div className="mb-5 flex flex-wrap items-center gap-2">
+                <span
+                  className={cn(
+                    "rounded-lg px-3 py-2 text-xs font-bold text-white",
+                    property.type === "VENDA" ? "bg-[#0369a1]" : "bg-[#0f766e]"
+                  )}
+                >
+                  {property.type === "VENDA" ? "Venda" : "Locacao"}
+                </span>
+                <span className="rounded-lg bg-[#ccfbf1] px-3 py-2 text-xs font-bold text-[#0f766e]">
+                  Atendimento consultivo
+                </span>
               </div>
-            )}
-          </div>
 
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <span className={cn(
-                "px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wider text-white",
-                property.type === "VENDA" ? "bg-blue-600" : "bg-emerald-600"
-              )}>
-                {property.type === "VENDA" ? "Venda" : "Locação"}
-              </span>
-              <span className="px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wider bg-slate-100 text-slate-600">
-                Pronto para morar
-              </span>
+              <h1 className="font-display max-w-4xl text-4xl font-bold leading-tight text-[#134e4a] md:text-5xl">
+                {property.title}
+              </h1>
+              <div className="mt-5 flex items-center gap-2 text-lg font-semibold text-[#475569]">
+                <MapPin className="h-5 w-5 text-[#0f766e]" />
+                {property.neighborhood}, {property.city}
+              </div>
             </div>
-            
-            <h1 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight mb-4">
-              {property.title}
-            </h1>
-            <div className="flex items-center gap-2 text-slate-500 font-medium text-lg">
-              <MapPin className="w-5 h-5" />
-              {property.neighborhood}, {property.city}
-            </div>
-          </div>
 
-          <div className="grid grid-cols-3 gap-4 py-8 border-y border-slate-200">
-            <div className="flex flex-col items-center justify-center p-4 bg-white rounded-2xl border border-slate-100 shadow-sm">
-              <BedDouble className="w-8 h-8 text-blue-500 mb-2" />
-              <span className="text-2xl font-bold text-slate-900">{property.bedrooms}</span>
-              <span className="text-sm font-medium text-slate-500">Quartos</span>
-            </div>
-            <div className="flex flex-col items-center justify-center p-4 bg-white rounded-2xl border border-slate-100 shadow-sm">
-              <Bath className="w-8 h-8 text-blue-500 mb-2" />
-              <span className="text-2xl font-bold text-slate-900">{property.bathrooms}</span>
-              <span className="text-sm font-medium text-slate-500">Banheiros</span>
-            </div>
-            <div className="flex flex-col items-center justify-center p-4 bg-white rounded-2xl border border-slate-100 shadow-sm">
-              <Square className="w-8 h-8 text-blue-500 mb-2" />
-              <span className="text-2xl font-bold text-slate-900">{property.area}</span>
-              <span className="text-sm font-medium text-slate-500">Metros (m²)</span>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-2xl font-bold text-slate-900 mb-4">Sobre o Imóvel</h3>
-            <p className="text-slate-600 text-lg leading-relaxed">
-              {property.description}
-            </p>
-          </div>
-        </div>
-
-        {/* Coluna Direita: Sticky CTA & Lead Form */}
-        <div>
-          <div className="sticky top-24 bg-white p-8 rounded-3xl border border-slate-200 shadow-xl shadow-slate-200/50">
-            <p className="text-slate-500 font-medium mb-2 uppercase tracking-wider text-sm">Valor do investimento</p>
-            <p className="text-4xl font-black text-slate-900 mb-8 tracking-tight">
-              {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(property.price)}
-            </p>
-
-            <div className="bg-slate-50 -mx-8 px-8 py-8 border-t border-slate-100">
-              <h4 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-                Tem interesse?
-              </h4>
-
-              {submitted ? (
-                <div className="bg-emerald-50 text-emerald-700 p-6 rounded-2xl border border-emerald-100 text-center font-medium">
-                  Informações enviadas com sucesso! Um corretor entrará em contato em breve.
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              {[
+                { icon: BedDouble, label: "Quartos", value: property.bedrooms },
+                { icon: Bath, label: "Banheiros", value: property.bathrooms },
+                { icon: Square, label: "Metros quadrados", value: `${property.area}m²` },
+              ].map((item) => (
+                <div key={item.label} className="rounded-lg border border-[#99f6e4] bg-white p-5 shadow-sm">
+                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-[#ccfbf1] text-[#0f766e]">
+                    <item.icon className="h-5 w-5" />
+                  </div>
+                  <strong className="block text-3xl text-[#134e4a]">{item.value}</strong>
+                  <span className="mt-1 block text-sm font-bold text-[#64748b]">{item.label}</span>
                 </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <input autoFocus required type="text" placeholder="Seu nome completo" className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" value={name} onChange={(e) => setName(e.target.value)} />
-                  </div>
-                  <div>
-                    <input required type="email" placeholder="Seu melhor e-mail" className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" value={email} onChange={(e) => setEmail(e.target.value)} />
-                  </div>
-                  <div>
-                    <input required type="tel" placeholder="Telefone / WhatsApp" className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" value={phone} onChange={(e) => setPhone(e.target.value)} />
-                  </div>
-                  <button disabled={isSubmitting} type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/30 transition-all disabled:opacity-50">
-                    {isSubmitting ? "Enviando..." : "Falar com Corretor"}
-                  </button>
-                  <p className="text-xs text-slate-500 text-center mt-4">
-                    Ao enviar, você concorda com nossos termos de privacidade.
-                  </p>
-                </form>
-              )}
+              ))}
             </div>
-          </div>
+
+            <section className="rounded-lg border border-[#99f6e4] bg-white p-6 shadow-sm">
+              <h2 className="font-display text-3xl font-bold text-[#134e4a]">Sobre o imovel</h2>
+              <p className="mt-4 text-lg leading-8 text-[#475569]">{property.description}</p>
+              <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                {["Documentacao acompanhada", "Visita com horario marcado", "Corretor especialista"].map((item) => (
+                  <div key={item} className="flex items-center gap-2 rounded-lg bg-[#f0fdfa] px-4 py-3 text-sm font-bold text-[#0f766e]">
+                    <CheckCircle2 className="h-4 w-4" />
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </section>
+          </section>
+
+          <aside id="contato" className="lg:sticky lg:top-28 lg:self-start">
+            <div className="rounded-lg border border-[#99f6e4] bg-white shadow-xl shadow-[#0f766e]/10">
+              <div className="border-b border-[#ccfbf1] p-6">
+                <p className="text-sm font-bold text-[#64748b]">Investimento</p>
+                <p className="mt-2 text-4xl font-bold text-[#134e4a]">
+                  {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(property.price)}
+                </p>
+              </div>
+
+              <div className="p-6">
+                <h2 className="text-xl font-bold text-[#134e4a]">Quero falar com um corretor</h2>
+                <p className="mt-2 text-sm leading-6 text-[#64748b]">
+                  Envie seus dados para receber disponibilidade, agenda de visita e condicoes de negociacao.
+                </p>
+
+                {submitted ? (
+                  <div className="mt-6 rounded-lg border border-[#6ee7b7] bg-[#ecfdf5] p-5 text-center font-bold text-[#047857]">
+                    Informacoes enviadas. Um corretor entrara em contato em breve.
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmit} className="mt-6 grid gap-4">
+                    <label className="grid gap-2 text-sm font-bold text-[#134e4a]">
+                      Nome completo
+                      <input
+                        autoFocus
+                        required
+                        type="text"
+                        className="focus-ring rounded-lg border border-[#99f6e4] bg-[#f8fafc] px-4 py-3 text-[#134e4a]"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                      />
+                    </label>
+                    <label className="grid gap-2 text-sm font-bold text-[#134e4a]">
+                      E-mail
+                      <input
+                        required
+                        type="email"
+                        className="focus-ring rounded-lg border border-[#99f6e4] bg-[#f8fafc] px-4 py-3 text-[#134e4a]"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                      />
+                    </label>
+                    <label className="grid gap-2 text-sm font-bold text-[#134e4a]">
+                      Telefone ou WhatsApp
+                      <input
+                        required
+                        type="tel"
+                        className="focus-ring rounded-lg border border-[#99f6e4] bg-[#f8fafc] px-4 py-3 text-[#134e4a]"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                      />
+                    </label>
+                    <button
+                      disabled={isSubmitting}
+                      type="submit"
+                      className="focus-ring inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#0369a1] px-5 py-4 font-bold text-white shadow-sm hover:bg-[#075985] disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {isSubmitting ? "Enviando..." : "Falar com corretor"}
+                      <MessageCircle className="h-5 w-5" />
+                    </button>
+                    <p className="text-center text-xs leading-5 text-[#64748b]">
+                      Seus dados serao usados apenas para atendimento deste interesse.
+                    </p>
+                  </form>
+                )}
+              </div>
+            </div>
+          </aside>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

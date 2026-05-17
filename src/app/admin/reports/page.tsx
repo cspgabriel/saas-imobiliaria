@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useAgency } from "../../../lib/AgencyContext";
 import { db, handleFirestoreError, OperationType } from "../../../lib/firebase";
-import { collection, query, onSnapshot, getDocs } from "firebase/firestore";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
-import { TrendingUp, Users, Home, Eye } from "lucide-react";
+import { collection, getDocs } from "firebase/firestore";
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Eye, Home, TrendingUp, Users } from "lucide-react";
 import { useAuth } from "../../../lib/AuthContext";
 
 export function AdminReports() {
@@ -23,15 +23,15 @@ export function AdminReports() {
       try {
         const propertiesSnap = await getDocs(collection(db, "agencies", agency.id, "properties"));
         const leadsSnap = await getDocs(collection(db, "agencies", agency.id, "leads"));
-        
+
         let views = 0;
-        propertiesSnap.forEach(doc => {
-          views += doc.data().views || 0;
+        propertiesSnap.forEach((item) => {
+          views += item.data().views || 0;
         });
 
         const statusCounts: Record<string, number> = {};
-        leadsSnap.forEach(doc => {
-          const status = doc.data().status || "NOVO";
+        leadsSnap.forEach((item) => {
+          const status = item.data().status || "NOVO";
           statusCounts[status] = (statusCounts[status] || 0) + 1;
         });
 
@@ -42,97 +42,105 @@ export function AdminReports() {
         });
 
         setLeadsByStatus(Object.entries(statusCounts).map(([name, value]) => ({ name, value })));
-
       } catch (err) {
-        handleFirestoreError(err, OperationType.GET, `reports`);
+        handleFirestoreError(err, OperationType.GET, "reports");
       }
     };
 
     fetchStats();
   }, [agency]);
 
-  if (loading) return <div className="p-8">Carregando...</div>;
+  if (loading) return <div className="p-6 text-lg font-bold text-[#0f766e]">Carregando...</div>;
+
+  const cards = [
+    { label: "Leads captados", value: stats.totalLeads, icon: Users, color: "bg-[#dbeafe] text-[#0369a1]" },
+    { label: "Imoveis ativos", value: stats.totalProperties, icon: Home, color: "bg-[#ccfbf1] text-[#0f766e]" },
+    { label: "Visualizacoes", value: stats.totalViews, icon: Eye, color: "bg-[#fef3c7] text-[#b45309]" },
+  ];
 
   return (
-    <div className="p-8 pb-32 max-w-7xl mx-auto">
-      <div className="mb-8">
-        <h2 className="text-3xl font-black text-slate-900 tracking-tight">Relatórios & Estatísticas</h2>
-        <p className="text-slate-500 font-medium">Acompanhe o desempenho da sua imobiliária.</p>
+    <div className="mx-auto max-w-7xl p-4 pb-28 sm:p-6 lg:p-8">
+      <section className="mb-6 rounded-lg border border-[#99f6e4] bg-white p-6 shadow-sm">
+        <p className="text-sm font-bold text-[#0369a1]">Business intelligence</p>
+        <h1 className="font-display mt-2 text-4xl font-bold text-[#134e4a]">Relatorios e estatisticas</h1>
+        <p className="mt-3 max-w-3xl text-[#475569]">
+          Visao compacta para entender origem de demanda, volume de carteira e gargalos do funil.
+        </p>
+      </section>
+
+      <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+        {cards.map((card) => (
+          <div key={card.label} className="rounded-lg border border-[#99f6e4] bg-white p-5 shadow-sm">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-bold text-[#64748b]">{card.label}</p>
+                <p className="mt-2 text-4xl font-bold text-[#134e4a]">{card.value}</p>
+              </div>
+              <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${card.color}`}>
+                <card.icon className="h-6 w-6" />
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
-          <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center">
-            <Users className="w-7 h-7" />
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_0.72fr]">
+        <section className="rounded-lg border border-[#99f6e4] bg-white p-6 shadow-sm">
+          <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+            <div>
+              <h2 className="text-xl font-bold text-[#134e4a]">Leads por status de funil</h2>
+              <p className="mt-1 text-sm text-[#64748b]">Distribuicao atual para ajustar foco do time.</p>
+            </div>
+            <TrendingUp className="h-6 w-6 text-[#0f766e]" />
           </div>
-          <div>
-            <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">Total de Leads</p>
-            <p className="text-3xl font-black text-slate-900">{stats.totalLeads}</p>
-          </div>
-        </div>
-        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
-          <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center">
-            <Home className="w-7 h-7" />
-          </div>
-          <div>
-            <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">Imóveis Ativos</p>
-            <p className="text-3xl font-black text-slate-900">{stats.totalProperties}</p>
-          </div>
-        </div>
-        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
-          <div className="w-14 h-14 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center">
-            <Eye className="w-7 h-7" />
-          </div>
-          <div>
-            <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">Visualizações</p>
-            <p className="text-3xl font-black text-slate-900">{stats.totalViews}</p>
-          </div>
-        </div>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-          <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-blue-500" />
-            Leads por Status de Funil
-          </h3>
-          <div className="h-64">
+          <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={leadsByStatus}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#64748B", fontWeight: 600 }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#64748B", fontWeight: 600 }} />
-                <Tooltip cursor={{ fill: "#F1F5F9" }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)', fontWeight: 'bold' }} />
-                <Bar dataKey="value" fill="#3B82F6" radius={[4, 4, 0, 0]} barSize={40} />
+              <BarChart data={leadsByStatus} margin={{ left: -20, right: 10, top: 10, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ccfbf1" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#475569", fontWeight: 700 }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#475569", fontWeight: 700 }} />
+                <Tooltip
+                  cursor={{ fill: "#f0fdfa" }}
+                  contentStyle={{
+                    borderRadius: 8,
+                    border: "1px solid #99f6e4",
+                    boxShadow: "0 12px 24px rgba(15, 118, 110, 0.12)",
+                    fontWeight: 700,
+                  }}
+                />
+                <Bar dataKey="value" fill="#0f766e" radius={[8, 8, 0, 0]} barSize={42} />
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </section>
 
         {profile?.role === "ADMIN" && (
-          <div className="bg-slate-900 p-8 rounded-2xl border border-slate-800 shadow-lg text-white">
-            <h3 className="text-xl font-black mb-2">Informações de Faturamento SaaS</h3>
-            <p className="text-slate-400 font-medium text-sm mb-8">Gerencie a assinatura da sua imobiliária.</p>
-            
-            <div className="bg-slate-800/50 p-6 rounded-xl border border-slate-700 mb-6">
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-slate-400 font-bold text-sm uppercase tracking-wider">Plano Atual</span>
-                <span className="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest">{agency?.plan}</span>
+          <section className="rounded-lg border border-[#99f6e4] bg-[#134e4a] p-6 text-white shadow-sm">
+            <p className="text-sm font-bold text-[#99f6e4]">Assinatura</p>
+            <h2 className="mt-2 text-2xl font-bold">Faturamento SaaS</h2>
+            <p className="mt-3 leading-7 text-[#ccfbf1]">Resumo administrativo para controlar plano, vencimento e upgrade da imobiliaria.</p>
+
+            <div className="mt-6 rounded-lg border border-white/15 bg-white/10 p-5">
+              <div className="mb-5 flex items-center justify-between gap-3">
+                <span className="text-sm font-bold text-[#ccfbf1]">Plano atual</span>
+                <span className="rounded-lg bg-white px-3 py-2 text-xs font-bold text-[#0f766e]">{agency?.plan || "PRO"}</span>
               </div>
-              <div className="flex justify-between items-end">
+              <div className="flex items-end justify-between gap-3">
                 <div>
-                  <span className="text-3xl font-black">R$ 299<span className="text-lg text-slate-500 font-medium">/mês</span></span>
+                  <span className="text-4xl font-bold">R$ 299</span>
+                  <span className="text-[#ccfbf1]">/mes</span>
                 </div>
-                <button className="bg-white text-slate-900 hover:bg-slate-100 px-5 py-2 rounded-lg font-bold transition-colors">
+                <button className="focus-ring rounded-lg bg-white px-4 py-3 text-sm font-bold text-[#134e4a] hover:bg-[#ccfbf1]">
                   Gerenciar
                 </button>
               </div>
             </div>
 
-            <p className="text-xs font-medium text-slate-500 text-center">
-              A fatura atual vence em 05/06/2026. <a href="#" className="text-blue-400 hover:underline">Ver histórico</a>
+            <p className="mt-5 text-sm leading-6 text-[#ccfbf1]">
+              Vencimento atual: 05/06/2026. Historico financeiro pode ser conectado ao checkout na proxima etapa.
             </p>
-          </div>
+          </section>
         )}
       </div>
     </div>

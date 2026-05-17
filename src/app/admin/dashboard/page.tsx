@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import { Building, Users, Target, ArrowUpRight, CheckCircle2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ArrowUpRight, Building2, CheckCircle2, Clock3, Target, Users } from "lucide-react";
 import { Link } from "wouter";
 import { useAgency } from "../../../lib/AgencyContext";
 import { db, handleFirestoreError, OperationType } from "../../../lib/firebase";
-import { collection, query, getDocs } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 
 type Stats = {
   totalProperties: number;
@@ -25,16 +25,16 @@ export function AdminDashboard() {
       try {
         const propertiesSnap = await getDocs(collection(db, "agencies", agency.id, "properties"));
         const leadsSnap = await getDocs(collection(db, "agencies", agency.id, "leads"));
-        
+
         let availableProperties = 0;
-        propertiesSnap.forEach(doc => {
-          if (doc.data().status === "DISPONIVEL") availableProperties++;
+        propertiesSnap.forEach((item) => {
+          if (item.data().status === "DISPONIVEL") availableProperties++;
         });
 
         let activeLeads = 0;
         let wonLeads = 0;
-        leadsSnap.forEach(doc => {
-          const status = doc.data().status;
+        leadsSnap.forEach((item) => {
+          const status = item.data().status;
           if (status !== "GANHO" && status !== "PERDIDO") activeLeads++;
           if (status === "GANHO") wonLeads++;
         });
@@ -48,75 +48,153 @@ export function AdminDashboard() {
           totalLeads,
           activeLeads,
           wonLeads,
-          conversionRate
+          conversionRate,
         });
-
       } catch (err) {
-        handleFirestoreError(err, OperationType.GET, `dashboard`);
+        handleFirestoreError(err, OperationType.GET, "dashboard");
       }
     };
 
     fetchStats();
   }, [agency]);
 
-  if (loading || !stats) return <div className="p-8">Carregando métricas...</div>;
+  const statCards = useMemo(() => {
+    if (!stats) return [];
+    return [
+      {
+        name: "Carteira",
+        value: stats.totalProperties,
+        desc: `${stats.availableProperties} disponiveis`,
+        icon: Building2,
+        color: "bg-[#ccfbf1] text-[#0f766e]",
+      },
+      {
+        name: "Leads",
+        value: stats.totalLeads,
+        desc: `${stats.activeLeads} em negociacao`,
+        icon: Users,
+        color: "bg-[#dbeafe] text-[#0369a1]",
+      },
+      {
+        name: "Fechados",
+        value: stats.wonLeads,
+        desc: "Ganhos no funil",
+        icon: CheckCircle2,
+        color: "bg-[#dcfce7] text-[#15803d]",
+      },
+      {
+        name: "Conversao",
+        value: `${stats.conversionRate}%`,
+        desc: "Leads convertidos",
+        icon: Target,
+        color: "bg-[#fef3c7] text-[#b45309]",
+      },
+    ];
+  }, [stats]);
 
-  const statCards = [
-    { name: "Total de Imóveis", value: stats.totalProperties, desc: `${stats.availableProperties} disponíveis agora`, icon: Building, color: "bg-blue-500" },
-    { name: "Leads Totais", value: stats.totalLeads, desc: `${stats.activeLeads} em negociação`, icon: Users, color: "bg-violet-500" },
-    { name: "Negócios Fechados", value: stats.wonLeads, desc: "Imóveis vendidos ou alugados", icon: CheckCircle2, color: "bg-emerald-500" },
-    { name: "Taxa de Conversão", value: `${stats.conversionRate}%`, desc: "Leads convertidos", icon: Target, color: "bg-amber-500" },
-  ];
+  if (loading || !stats) {
+    return <div className="p-6 text-lg font-bold text-[#0f766e]">Carregando metricas...</div>;
+  }
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h2 className="text-3xl font-black text-slate-900 tracking-tight">Painel Resumo</h2>
-        <p className="text-slate-500 font-medium">Bem-vindo de volta! Aqui está o panorama do seu negócio.</p>
-      </div>
+    <div className="mx-auto max-w-7xl p-4 pb-28 sm:p-6 lg:p-8">
+      <section className="mb-6 rounded-lg border border-[#99f6e4] bg-white p-6 shadow-sm">
+        <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
+          <div>
+            <p className="text-sm font-bold text-[#0369a1]">Resumo operacional</p>
+            <h1 className="font-display mt-2 text-4xl font-bold text-[#134e4a]">Panorama da imobiliaria</h1>
+            <p className="mt-3 max-w-3xl text-[#475569]">
+              Acompanhe estoque, demanda, conversao e proximas acoes comerciais em uma tela densa para uso diario.
+            </p>
+          </div>
+          <div className="rounded-lg bg-[#f0fdfa] px-4 py-3 text-sm font-bold text-[#0f766e]">
+            Atualizado em tempo real pelo Firestore
+          </div>
+        </div>
+      </section>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-        {statCards.map((stat, i) => (
-          <div key={i} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-start gap-4">
-            <div className={`p-4 rounded-xl text-white ${stat.color} shadow-lg shadow-black/5`}>
-              <stat.icon className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-sm font-bold text-slate-500 mb-1">{stat.name}</p>
-              <h3 className="text-2xl font-black text-slate-900 mb-1">{stat.value}</h3>
-              <p className="text-xs text-slate-500 font-medium">{stat.desc}</p>
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {statCards.map((stat) => (
+          <div key={stat.name} className="rounded-lg border border-[#99f6e4] bg-white p-5 shadow-sm">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-sm font-bold text-[#64748b]">{stat.name}</p>
+                <h2 className="mt-2 text-4xl font-bold text-[#134e4a]">{stat.value}</h2>
+                <p className="mt-1 text-sm font-semibold text-[#475569]">{stat.desc}</p>
+              </div>
+              <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${stat.color}`}>
+                <stat.icon className="h-6 w-6" />
+              </div>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Acesso rápido */}
-        <div className="bg-white border border-slate-200 p-8 rounded-3xl shadow-sm">
-          <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center justify-between">
-            Ações Rápidas
-          </h3>
-          <div className="space-y-4">
-            <Link href="/admin/properties" className="block p-4 rounded-xl border border-slate-200 hover:border-blue-500 hover:bg-blue-50/50 transition-colors group">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h4 className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors">Gerenciar Imóveis</h4>
-                  <p className="text-sm text-slate-500">Adicionar, editar ou remover cadastros</p>
-                </div>
-                <ArrowUpRight className="w-5 h-5 text-slate-400 group-hover:text-blue-600 transition-colors" />
-              </div>
-            </Link>
-            <Link href="/admin/crm" className="block p-4 rounded-xl border border-slate-200 hover:border-violet-500 hover:bg-violet-50/50 transition-colors group">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h4 className="font-bold text-slate-900 group-hover:text-violet-600 transition-colors">Ver Pipeline de Vendas (CRM)</h4>
-                  <p className="text-sm text-slate-500">Acompanhar leads e mover cards do funil</p>
-                </div>
-                <ArrowUpRight className="w-5 h-5 text-slate-400 group-hover:text-violet-600 transition-colors" />
-              </div>
-            </Link>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_0.75fr]">
+        <section className="rounded-lg border border-[#99f6e4] bg-white p-6 shadow-sm">
+          <div className="mb-5 flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-xl font-bold text-[#134e4a]">Acoes rapidas</h2>
+              <p className="text-sm text-[#64748b]">Atalhos para as rotinas que movimentam venda.</p>
+            </div>
+            <Clock3 className="h-6 w-6 text-[#0f766e]" />
           </div>
-        </div>
+
+          <div className="grid gap-3">
+            {[
+              {
+                href: "/admin/properties",
+                title: "Cadastrar ou revisar imoveis",
+                desc: "Atualize fotos, preco, status e pagina publica.",
+              },
+              {
+                href: "/admin/crm",
+                title: "Atender leads em aberto",
+                desc: "Priorize novos contatos, visitas e propostas.",
+              },
+              {
+                href: "/admin/marketing",
+                title: "Criar anuncios com IA",
+                desc: "Transforme um imovel em copy para campanha.",
+              },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="focus-ring flex items-center justify-between gap-4 rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-4 transition-colors duration-200 hover:border-[#14b8a6] hover:bg-[#f0fdfa]"
+              >
+                <div>
+                  <h3 className="font-bold text-[#134e4a]">{item.title}</h3>
+                  <p className="mt-1 text-sm text-[#64748b]">{item.desc}</p>
+                </div>
+                <ArrowUpRight className="h-5 w-5 shrink-0 text-[#0f766e]" />
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="rounded-lg border border-[#99f6e4] bg-[#134e4a] p-6 text-white shadow-sm">
+          <h2 className="text-xl font-bold">Saude do funil</h2>
+          <p className="mt-2 text-[#ccfbf1]">Use como leitura rapida antes da reuniao comercial.</p>
+
+          <div className="mt-6 space-y-4">
+            {[
+              ["Leads ativos", stats.activeLeads, Math.min(stats.activeLeads * 8, 100)],
+              ["Imoveis disponiveis", stats.availableProperties, Math.min(stats.availableProperties * 6, 100)],
+              ["Conversao", `${stats.conversionRate}%`, Math.min(Number(stats.conversionRate) * 8, 100)],
+            ].map(([label, value, width]) => (
+              <div key={String(label)}>
+                <div className="mb-2 flex justify-between text-sm font-bold">
+                  <span>{label}</span>
+                  <span>{value}</span>
+                </div>
+                <div className="h-2 rounded-full bg-white/15">
+                  <div className="h-2 rounded-full bg-[#14b8a6]" style={{ width: `${width}%` }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   );

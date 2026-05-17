@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { Plus, Link as LinkIcon, Building, Trash2, Edit, Search } from "lucide-react";
+import React, { useEffect, useMemo, useState } from "react";
+import { Building2, Edit, Link as LinkIcon, Plus, Search, Trash2, X } from "lucide-react";
 import { cn } from "../../../lib/utils";
-import { collection, query, onSnapshot, deleteDoc, doc, setDoc, Timestamp } from "firebase/firestore";
+import { collection, deleteDoc, doc, onSnapshot, query, setDoc, Timestamp } from "firebase/firestore";
 import { db, handleFirestoreError, OperationType } from "../../../lib/firebase";
 import { useAgency } from "../../../lib/AgencyContext";
 
@@ -44,16 +44,22 @@ export function AdminProperties() {
   useEffect(() => {
     if (!agency) return;
     const q = query(collection(db, "agencies", agency.id, "properties"));
-    const unsub = onSnapshot(q, (snap) => {
-      setProperties(snap.docs.map((d) => {
-        const data = d.data();
-        return {
-          id: d.id,
-          ...data,
-          createdAt: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString()
-        } as Property;
-      }));
-    }, (error) => handleFirestoreError(error, OperationType.LIST, `agencies/${agency.id}/properties`));
+    const unsub = onSnapshot(
+      q,
+      (snap) => {
+        setProperties(
+          snap.docs.map((item) => {
+            const data = item.data();
+            return {
+              id: item.id,
+              ...data,
+              createdAt: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+            } as Property;
+          })
+        );
+      },
+      (error) => handleFirestoreError(error, OperationType.LIST, `agencies/${agency.id}/properties`)
+    );
     return unsub;
   }, [agency]);
 
@@ -92,12 +98,21 @@ export function AdminProperties() {
     e.preventDefault();
     if (!agency) return;
 
-    const payload = { 
-      title, description, price: Number(price), type, status, city, neighborhood, 
-      bedrooms: Number(bedrooms), bathrooms: Number(bathrooms), area: Number(area), imageUrl,
-      updatedAt: Timestamp.now()
+    const payload = {
+      title,
+      description,
+      price: Number(price),
+      type,
+      status,
+      city,
+      neighborhood,
+      bedrooms: Number(bedrooms),
+      bathrooms: Number(bathrooms),
+      area: Number(area),
+      imageUrl,
+      updatedAt: Timestamp.now(),
     };
-    
+
     try {
       if (editingId) {
         await setDoc(doc(db, "agencies", agency.id, "properties", editingId), payload, { merge: true });
@@ -114,189 +129,221 @@ export function AdminProperties() {
 
   const handleDelete = async (id: string) => {
     if (!agency) return;
-    if (!confirm("Tem certeza que deseja excluir este imóvel?")) return;
+    if (!confirm("Tem certeza que deseja excluir este imovel?")) return;
     try {
       await deleteDoc(doc(db, "agencies", agency.id, "properties", id));
-    } catch(err) {
+    } catch (err) {
       handleFirestoreError(err, OperationType.DELETE, `agencies/${agency.id}/properties`);
     }
   };
 
-  if (agencyLoading) return <div className="p-8">Carregando...</div>;
+  const filteredProperties = useMemo(() => {
+    const normalizedTerm = searchTerm.toLowerCase();
+    return properties.filter((prop) => {
+      const matchesSearch =
+        prop.title?.toLowerCase().includes(normalizedTerm) ||
+        prop.city?.toLowerCase().includes(normalizedTerm) ||
+        prop.neighborhood?.toLowerCase().includes(normalizedTerm);
+      const matchesStatus = statusFilter ? prop.status === statusFilter : true;
+      return matchesSearch && matchesStatus;
+    });
+  }, [properties, searchTerm, statusFilter]);
 
-  const filteredProperties = properties.filter(p => {
-    const matchesSearch = p.title?.toLowerCase().includes(searchTerm.toLowerCase()) || p.city?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter ? p.status === statusFilter : true;
-    return matchesSearch && matchesStatus;
-  });
+  if (agencyLoading) return <div className="p-6 text-lg font-bold text-[#0f766e]">Carregando...</div>;
+
+  const statusClass: Record<string, string> = {
+    DISPONIVEL: "bg-[#dcfce7] text-[#15803d]",
+    RESERVADO: "bg-[#fef3c7] text-[#b45309]",
+    VENDIDO: "bg-[#e2e8f0] text-[#475569]",
+  };
 
   return (
-    <div className="p-8 pb-32">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-        <div>
-          <h2 className="text-3xl font-black text-slate-900 tracking-tight">Imóveis</h2>
-          <p className="text-slate-500 font-medium">Cadastre e gerencie a carteira de imóveis da {agency?.name}.</p>
+    <div className="mx-auto max-w-7xl p-4 pb-28 sm:p-6 lg:p-8">
+      <section className="mb-6 rounded-lg border border-[#99f6e4] bg-white p-6 shadow-sm">
+        <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
+          <div>
+            <p className="text-sm font-bold text-[#0369a1]">Carteira</p>
+            <h1 className="font-display mt-2 text-4xl font-bold text-[#134e4a]">Imoveis</h1>
+            <p className="mt-3 max-w-3xl text-[#475569]">Cadastre, revise e publique oportunidades da {agency?.name}.</p>
+          </div>
+          <button
+            onClick={() => {
+              resetForm();
+              setIsModalOpen(true);
+            }}
+            className="focus-ring inline-flex items-center justify-center gap-2 rounded-lg bg-[#0369a1] px-5 py-4 font-bold text-white shadow-sm hover:bg-[#075985]"
+          >
+            <Plus className="h-5 w-5" />
+            Novo imovel
+          </button>
         </div>
-        <button onClick={() => { resetForm(); setIsModalOpen(true); }} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold transition-colors flex items-center gap-2 shadow-lg shadow-blue-500/20">
-          <Plus className="w-5 h-5" /> Novo Imóvel
-        </button>
-      </div>
+      </section>
 
-      <div className="mb-6 flex gap-4">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input 
-            type="text" 
-            placeholder="Buscar imóveis..." 
-            className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-sm"
+      <section className="mb-5 grid gap-3 rounded-lg border border-[#99f6e4] bg-white p-4 shadow-sm md:grid-cols-[1fr_220px]">
+        <label className="relative block">
+          <span className="sr-only">Buscar imoveis</span>
+          <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#64748b]" />
+          <input
+            type="search"
+            placeholder="Buscar por titulo, cidade ou bairro"
+            className="focus-ring w-full rounded-lg border border-[#ccfbf1] bg-[#f8fafc] py-4 pl-12 pr-4 text-[#134e4a] placeholder:text-[#64748b]"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-        </div>
-        <select 
-          className="px-4 py-3 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-sm font-medium"
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-        >
-          <option value="">Todos os status</option>
-          <option value="DISPONIVEL">Disponível</option>
-          <option value="RESERVADO">Reservado</option>
-          <option value="VENDIDO">Vendido / Alugado</option>
-        </select>
-      </div>
+        </label>
+        <label className="block">
+          <span className="sr-only">Filtrar por status</span>
+          <select
+            className="focus-ring w-full rounded-lg border border-[#ccfbf1] bg-[#f8fafc] px-4 py-4 font-bold text-[#134e4a]"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="">Todos os status</option>
+            <option value="DISPONIVEL">Disponivel</option>
+            <option value="RESERVADO">Reservado</option>
+            <option value="VENDIDO">Vendido / Alugado</option>
+          </select>
+        </label>
+      </section>
 
-      <div className="bg-white border text-left border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 text-sm font-semibold uppercase tracking-wider">
-              <th className="p-4">ID / Título</th>
-              <th className="p-4">Tipo</th>
-              <th className="p-4">Cidade / Bairro</th>
-              <th className="p-4">Valor</th>
-              <th className="p-4">Status</th>
-              <th className="p-4 text-right">Ações</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {filteredProperties.map((prop) => (
-              <tr key={prop.id} className="hover:bg-slate-50 transition-colors group">
-                <td className="p-4">
-                  <div className="font-bold text-slate-900 line-clamp-1">{prop.title}</div>
-                  <div className="text-xs text-slate-400 font-mono mt-1">{prop.id.substring(0,8)}...</div>
-                </td>
-                <td className="p-4">
-                  <span className="px-2.5 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-md">
-                    {prop.type}
-                  </span>
-                </td>
-                <td className="p-4 text-slate-600 font-medium text-sm">
-                  {prop.city} <br/><span className="text-slate-400">{prop.neighborhood}</span>
-                </td>
-                <td className="p-4 font-bold text-slate-900">
-                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(prop.price)}
-                </td>
-                <td className="p-4">
-                  <span className={cn(
-                    "px-2.5 py-1 text-xs font-bold rounded-md inline-block",
-                    prop.status === "DISPONIVEL" ? "bg-emerald-100 text-emerald-800" : 
-                    prop.status === "RESERVADO" ? "bg-amber-100 text-amber-800" : 
-                    "bg-slate-100 text-slate-600"
-                  )}>
-                    {prop.status}
-                  </span>
-                </td>
-                <td className="p-4 text-right flex items-center justify-end gap-3 opacity-50 group-hover:opacity-100 transition-opacity">
-                  <a href={`/imovel/${prop.id}`} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-blue-600 transition-colors" title="Ver no site">
-                    <LinkIcon className="w-5 h-5" />
-                  </a>
-                  <button onClick={() => handleEditClick(prop)} className="text-slate-400 hover:text-blue-600 transition-colors" title="Editar">
-                    <Edit className="w-5 h-5" />
-                  </button>
-                  <button onClick={() => handleDelete(prop.id)} className="text-slate-400 hover:text-red-600 transition-colors" title="Excluir">
-                    <Trash2 className="w-5 h-5" />
-                  </button>
-                </td>
+      <section className="overflow-hidden rounded-lg border border-[#99f6e4] bg-white shadow-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[880px] border-collapse text-left">
+            <thead>
+              <tr className="border-b border-[#ccfbf1] bg-[#f0fdfa] text-sm font-bold text-[#475569]">
+                <th className="p-4">Imovel</th>
+                <th className="p-4">Tipo</th>
+                <th className="p-4">Localizacao</th>
+                <th className="p-4">Valor</th>
+                <th className="p-4">Status</th>
+                <th className="p-4 text-right">Acoes</th>
               </tr>
-            ))}
-            {filteredProperties.length === 0 && (
-              <tr>
-                <td colSpan={6} className="p-12 text-center text-slate-500 font-medium">
-                  <Building className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                  Nenhum imóvel encontrado
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="divide-y divide-[#ccfbf1]">
+              {filteredProperties.map((prop) => (
+                <tr key={prop.id} className="transition-colors duration-200 hover:bg-[#f8fafc]">
+                  <td className="p-4">
+                    <div className="font-bold text-[#134e4a]">{prop.title}</div>
+                    <div className="mt-1 font-mono text-xs text-[#64748b]">{prop.id.substring(0, 8)}...</div>
+                  </td>
+                  <td className="p-4">
+                    <span className="rounded-lg bg-[#ccfbf1] px-3 py-2 text-xs font-bold text-[#0f766e]">{prop.type}</span>
+                  </td>
+                  <td className="p-4 text-sm font-semibold text-[#475569]">
+                    {prop.city}
+                    <br />
+                    <span className="text-[#64748b]">{prop.neighborhood}</span>
+                  </td>
+                  <td className="p-4 font-bold text-[#134e4a]">
+                    {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(prop.price)}
+                  </td>
+                  <td className="p-4">
+                    <span className={cn("inline-block rounded-lg px-3 py-2 text-xs font-bold", statusClass[prop.status] || "bg-[#e2e8f0] text-[#475569]")}>
+                      {prop.status}
+                    </span>
+                  </td>
+                  <td className="p-4">
+                    <div className="flex items-center justify-end gap-2">
+                      <a href={`/imovel/${prop.id}`} target="_blank" rel="noopener noreferrer" className="focus-ring rounded-lg p-2 text-[#64748b] hover:bg-[#ccfbf1] hover:text-[#0f766e]" title="Ver no site" aria-label="Ver no site">
+                        <LinkIcon className="h-5 w-5" />
+                      </a>
+                      <button onClick={() => handleEditClick(prop)} className="focus-ring rounded-lg p-2 text-[#64748b] hover:bg-[#ccfbf1] hover:text-[#0f766e]" title="Editar" aria-label="Editar">
+                        <Edit className="h-5 w-5" />
+                      </button>
+                      <button onClick={() => handleDelete(prop.id)} className="focus-ring rounded-lg p-2 text-[#64748b] hover:bg-[#fee2e2] hover:text-[#dc2626]" title="Excluir" aria-label="Excluir">
+                        <Trash2 className="h-5 w-5" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {filteredProperties.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="p-12 text-center text-[#64748b]">
+                    <Building2 className="mx-auto mb-3 h-12 w-12 text-[#0f766e]" />
+                    <p className="font-bold">Nenhum imovel encontrado</p>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl p-8">
-            <h3 className="text-2xl font-bold text-slate-900 mb-6 border-b border-slate-100 pb-4">
-              {editingId ? "Editar Imóvel" : "Cadastrar Novo Imóvel"}
-            </h3>
-            <form onSubmit={handleCreateOrUpdate} className="space-y-6">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <div className="col-span-2 md:col-span-3">
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Título do Anúncio</label>
-                  <input required type="text" className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all" value={title} onChange={(e) => setTitle(e.target.value)} />
-                </div>
-                <div className="col-span-2 md:col-span-3">
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Descrição</label>
-                  <textarea required rows={4} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all" value={description} onChange={(e) => setDescription(e.target.value)} />
-                </div>
-                <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Tipo de Negócio</label>
-                  <select className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium" value={type} onChange={(e) => setType(e.target.value)}>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#134e4a]/50 p-4 backdrop-blur-sm">
+          <div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-lg border border-[#99f6e4] bg-white shadow-2xl">
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#ccfbf1] bg-white p-5">
+              <div>
+                <h2 className="text-2xl font-bold text-[#134e4a]">{editingId ? "Editar imovel" : "Cadastrar imovel"}</h2>
+                <p className="text-sm text-[#64748b]">Campos usados no site publico e no CRM.</p>
+              </div>
+              <button onClick={() => setIsModalOpen(false)} className="focus-ring rounded-lg p-2 text-[#64748b] hover:bg-[#ccfbf1]" aria-label="Fechar">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateOrUpdate} className="grid gap-5 p-5">
+              <div className="grid gap-4 md:grid-cols-3">
+                <label className="grid gap-2 text-sm font-bold text-[#134e4a] md:col-span-3">
+                  Titulo do anuncio
+                  <input required type="text" className="focus-ring rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-3" value={title} onChange={(e) => setTitle(e.target.value)} />
+                </label>
+                <label className="grid gap-2 text-sm font-bold text-[#134e4a] md:col-span-3">
+                  Descricao
+                  <textarea required rows={4} className="focus-ring rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-3" value={description} onChange={(e) => setDescription(e.target.value)} />
+                </label>
+                <label className="grid gap-2 text-sm font-bold text-[#134e4a]">
+                  Tipo
+                  <select className="focus-ring rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-3" value={type} onChange={(e) => setType(e.target.value)}>
                     <option value="VENDA">Venda</option>
-                    <option value="LOCACAO">Locação</option>
+                    <option value="LOCACAO">Locacao</option>
                   </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Status</label>
-                  <select className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium" value={status} onChange={(e) => setStatus(e.target.value)}>
-                    <option value="DISPONIVEL">Disponível</option>
+                </label>
+                <label className="grid gap-2 text-sm font-bold text-[#134e4a]">
+                  Status
+                  <select className="focus-ring rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-3" value={status} onChange={(e) => setStatus(e.target.value)}>
+                    <option value="DISPONIVEL">Disponivel</option>
                     <option value="RESERVADO">Reservado</option>
                     <option value="VENDIDO">Vendido / Alugado</option>
                   </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Valor (R$)</label>
-                  <input required type="number" className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all" value={price} onChange={(e) => setPrice(e.target.value)} />
-                </div>
-                
-                <div className="col-span-2 md:col-span-1">
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Quartos</label>
-                  <input required type="number" min="0" className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all" value={bedrooms} onChange={(e) => setBedrooms(e.target.value)} />
-                </div>
-                <div className="col-span-2 md:col-span-1">
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Banheiros</label>
-                  <input required type="number" min="0" className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all" value={bathrooms} onChange={(e) => setBathrooms(e.target.value)} />
-                </div>
-                <div className="col-span-2 md:col-span-1">
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Área (m²)</label>
-                  <input required type="number" min="0" className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all" value={area} onChange={(e) => setArea(e.target.value)} />
-                </div>
-
-                <div className="col-span-2 md:col-span-1">
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Cidade</label>
-                  <input required type="text" className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all" value={city} onChange={(e) => setCity(e.target.value)} />
-                </div>
-                <div className="col-span-2 md:col-span-2">
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Bairro</label>
-                  <input required type="text" className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all" value={neighborhood} onChange={(e) => setNeighborhood(e.target.value)} />
-                </div>
-
-                <div className="col-span-2 md:col-span-3">
-                  <label className="block text-sm font-bold text-slate-700 mb-2">URL da Imagem Padrão</label>
-                  <input type="text" placeholder="https://..." className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all font-mono text-sm" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
-                </div>
+                </label>
+                <label className="grid gap-2 text-sm font-bold text-[#134e4a]">
+                  Valor (R$)
+                  <input required type="number" className="focus-ring rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-3" value={price} onChange={(e) => setPrice(e.target.value)} />
+                </label>
+                <label className="grid gap-2 text-sm font-bold text-[#134e4a]">
+                  Quartos
+                  <input required type="number" min="0" className="focus-ring rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-3" value={bedrooms} onChange={(e) => setBedrooms(e.target.value)} />
+                </label>
+                <label className="grid gap-2 text-sm font-bold text-[#134e4a]">
+                  Banheiros
+                  <input required type="number" min="0" className="focus-ring rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-3" value={bathrooms} onChange={(e) => setBathrooms(e.target.value)} />
+                </label>
+                <label className="grid gap-2 text-sm font-bold text-[#134e4a]">
+                  Area (m²)
+                  <input required type="number" min="0" className="focus-ring rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-3" value={area} onChange={(e) => setArea(e.target.value)} />
+                </label>
+                <label className="grid gap-2 text-sm font-bold text-[#134e4a]">
+                  Cidade
+                  <input required type="text" className="focus-ring rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-3" value={city} onChange={(e) => setCity(e.target.value)} />
+                </label>
+                <label className="grid gap-2 text-sm font-bold text-[#134e4a] md:col-span-2">
+                  Bairro
+                  <input required type="text" className="focus-ring rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-3" value={neighborhood} onChange={(e) => setNeighborhood(e.target.value)} />
+                </label>
+                <label className="grid gap-2 text-sm font-bold text-[#134e4a] md:col-span-3">
+                  URL da imagem principal
+                  <input type="url" placeholder="https://..." className="focus-ring rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-3 font-mono text-sm" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
+                </label>
               </div>
-              <div className="flex justify-end gap-3 pt-6 border-t border-slate-100">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-3 rounded-lg font-bold text-slate-600 hover:bg-slate-100 transition-colors">Cancelar</button>
-                <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-bold shadow-lg shadow-blue-500/30 transition-all">
-                  {editingId ? "Atualizar Imóvel" : "Salvar Imóvel"}
+
+              <div className="flex flex-col justify-end gap-3 border-t border-[#ccfbf1] pt-5 sm:flex-row">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="focus-ring rounded-lg border border-[#99f6e4] px-6 py-3 font-bold text-[#134e4a] hover:bg-[#ccfbf1]">
+                  Cancelar
+                </button>
+                <button type="submit" className="focus-ring rounded-lg bg-[#0369a1] px-8 py-3 font-bold text-white shadow-sm hover:bg-[#075985]">
+                  {editingId ? "Atualizar imovel" : "Salvar imovel"}
                 </button>
               </div>
             </form>

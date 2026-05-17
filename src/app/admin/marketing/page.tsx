@@ -1,15 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAgency } from "../../../lib/AgencyContext";
 import { db, handleFirestoreError, OperationType } from "../../../lib/firebase";
-import { collection, query, getDocs } from "firebase/firestore";
-import { Facebook, Instagram, Search, Sparkles, Copy, Check } from "lucide-react";
+import { collection, getDocs, query } from "firebase/firestore";
+import { Check, Copy, Facebook, Instagram, Search, Sparkles } from "lucide-react";
 import { cn } from "../../../lib/utils";
+
+type Platform = "FACEBOOK" | "INSTAGRAM" | "GOOGLE";
 
 export function AdminMarketing() {
   const { agency, loading } = useAgency();
   const [properties, setProperties] = useState<any[]>([]);
   const [selectedPropId, setSelectedPropId] = useState<string>("");
-  const [adPlatform, setAdPlatform] = useState<"FACEBOOK" | "INSTAGRAM" | "GOOGLE">("FACEBOOK");
+  const [adPlatform, setAdPlatform] = useState<Platform>("FACEBOOK");
   const [generatedAd, setGeneratedAd] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -20,7 +22,7 @@ export function AdminMarketing() {
       try {
         const q = query(collection(db, "agencies", agency.id, "properties"));
         const snap = await getDocs(q);
-        setProperties(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+        setProperties(snap.docs.map((item) => ({ id: item.id, ...item.data() })));
         if (!snap.empty) {
           setSelectedPropId(snap.docs[0].id);
         }
@@ -31,37 +33,39 @@ export function AdminMarketing() {
     fetchProps();
   }, [agency]);
 
+  const selectedProperty = useMemo(
+    () => properties.find((property) => property.id === selectedPropId),
+    [properties, selectedPropId]
+  );
+
   const generateAd = async () => {
-    if (!selectedPropId) return;
+    if (!selectedPropId || !selectedProperty) return;
     setIsGenerating(true);
     setGeneratedAd("");
     setCopied(false);
 
-    const prop = properties.find(p => p.id === selectedPropId);
-    
     try {
-      const prompt = `Crie um anúncio de alta conversão para a plataforma ${adPlatform} para o seguinte imóvel:
-      Título: ${prop.title}
-      Descrição: ${prop.description}
-      Tipo: ${prop.type}
-      Cidade/Bairro: ${prop.city} - ${prop.neighborhood}
-      Quartos: ${prop.bedrooms}, Banheiros: ${prop.bathrooms}, Área: ${prop.area}m²
-      Preço: R$ ${prop.price}
-      
-      O tom deve ser persuasivo, focado em alto padrão, incluir emojis adequados e uma forte chamada para ação (CTA) convidando para chamar no WhatsApp ou acessar o site da imobiliária ${agency?.name}. Limite de 150 palavras.`;
+      const prompt = `Crie um anuncio de alta conversao para a plataforma ${adPlatform} para o seguinte imovel:
+      Titulo: ${selectedProperty.title}
+      Descricao: ${selectedProperty.description}
+      Tipo: ${selectedProperty.type}
+      Cidade/Bairro: ${selectedProperty.city} - ${selectedProperty.neighborhood}
+      Quartos: ${selectedProperty.bedrooms}, Banheiros: ${selectedProperty.bathrooms}, Area: ${selectedProperty.area}m²
+      Preco: R$ ${selectedProperty.price}
 
-      // Simulating an API call to server.ts, but we will call our new api route
+      O tom deve ser persuasivo, focado em alto padrao, com CTA forte para WhatsApp ou site da imobiliaria ${agency?.name}. Limite de 150 palavras.`;
+
       const response = await fetch("/api/generate-ad", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt }),
       });
       const data = await response.json();
-      if(data.error) throw new Error(data.error);
+      if (data.error) throw new Error(data.error);
       setGeneratedAd(data.ad);
     } catch (err) {
       console.error(err);
-      alert("Erro ao gerar anúncio. Verifique se o backend está configurado com a API do Gemini.");
+      alert("Erro ao gerar anuncio. Verifique se o backend esta configurado com a API do Gemini.");
     } finally {
       setIsGenerating(false);
     }
@@ -73,90 +77,114 @@ export function AdminMarketing() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  if (loading) return <div className="p-8">Carregando...</div>;
+  if (loading) return <div className="p-6 text-lg font-bold text-[#0f766e]">Carregando...</div>;
 
-  const getPlatformIcon = (plt: string) => {
-    switch (plt) {
-      case "FACEBOOK": return <Facebook className="w-5 h-5 text-blue-600" />;
-      case "INSTAGRAM": return <Instagram className="w-5 h-5 text-pink-600" />;
-      case "GOOGLE": return <Search className="w-5 h-5 text-green-600" />;
-      default: return null;
-    }
-  };
+  const platforms = [
+    { key: "FACEBOOK" as const, label: "Facebook", icon: Facebook, color: "text-[#1877f2]" },
+    { key: "INSTAGRAM" as const, label: "Instagram", icon: Instagram, color: "text-[#c13584]" },
+    { key: "GOOGLE" as const, label: "Google", icon: Search, color: "text-[#0f766e]" },
+  ];
 
   return (
-    <div className="p-8 pb-32 max-w-5xl mx-auto">
-      <div className="mb-8">
-        <h2 className="text-3xl font-black text-slate-900 tracking-tight">Marketing & Anúncios (IA)</h2>
-        <p className="text-slate-500 font-medium">Gere cópias de anúncios persuasivos automaticamente para seus imóveis usando Inteligência Artificial.</p>
-      </div>
+    <div className="mx-auto max-w-7xl p-4 pb-28 sm:p-6 lg:p-8">
+      <section className="mb-6 rounded-lg border border-[#99f6e4] bg-white p-6 shadow-sm">
+        <p className="text-sm font-bold text-[#0369a1]">Marketing com IA</p>
+        <h1 className="font-display mt-2 text-4xl font-bold text-[#134e4a]">Gerador de anuncios imobiliarios</h1>
+        <p className="mt-3 max-w-3xl text-[#475569]">
+          Transforme dados do imovel em copy pronta para campanha, mantendo contexto comercial e chamada clara para atendimento.
+        </p>
+      </section>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-          <h3 className="text-lg font-bold text-slate-900 mb-6">Configuração do Anúncio</h3>
-          
-          <div className="space-y-6">
-            <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">Selecione o Imóvel</label>
-              <select 
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[0.8fr_1fr]">
+        <section className="rounded-lg border border-[#99f6e4] bg-white p-6 shadow-sm">
+          <h2 className="text-xl font-bold text-[#134e4a]">Configurar anuncio</h2>
+          <p className="mt-2 text-sm leading-6 text-[#64748b]">Escolha o imovel, canal e gere uma copy com base no cadastro.</p>
+
+          <div className="mt-6 grid gap-5">
+            <label className="grid gap-2 text-sm font-bold text-[#134e4a]">
+              Imovel
+              <select
                 value={selectedPropId}
                 onChange={(e) => setSelectedPropId(e.target.value)}
-                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium"
+                className="focus-ring rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-4 text-[#134e4a]"
               >
-                {properties.map(p => (
-                  <option key={p.id} value={p.id}>{p.title} - R$ {p.price}</option>
+                {properties.map((property) => (
+                  <option key={property.id} value={property.id}>
+                    {property.title} - R$ {property.price}
+                  </option>
                 ))}
               </select>
-            </div>
+            </label>
 
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-3">Plataforma de Destino</label>
-              <div className="grid grid-cols-3 gap-3">
-                {["FACEBOOK", "INSTAGRAM", "GOOGLE"].map((plt) => (
+              <p className="mb-3 text-sm font-bold text-[#134e4a]">Canal</p>
+              <div className="grid grid-cols-3 gap-2 rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-2">
+                {platforms.map((platform) => (
                   <button
-                    key={plt}
-                    onClick={() => setAdPlatform(plt as any)}
+                    key={platform.key}
+                    type="button"
+                    onClick={() => setAdPlatform(platform.key)}
                     className={cn(
-                      "p-3 rounded-xl border flex flex-col items-center gap-2 transition-all cursor-pointer font-bold text-xs",
-                      adPlatform === plt ? "bg-blue-50 border-blue-400 text-blue-700 shadow-sm" : "bg-white border-slate-200 text-slate-500 hover:bg-slate-50"
+                      "focus-ring flex min-h-24 flex-col items-center justify-center gap-2 rounded-lg px-2 py-3 text-xs font-bold transition-colors duration-200",
+                      adPlatform === platform.key ? "bg-white text-[#134e4a] shadow-sm" : "text-[#64748b] hover:bg-white/70"
                     )}
                   >
-                    {getPlatformIcon(plt)}
-                    {plt}
+                    <platform.icon className={cn("h-5 w-5", platform.color)} />
+                    {platform.label}
                   </button>
                 ))}
               </div>
             </div>
 
-            <button 
-              onClick={generateAd} 
+            {selectedProperty && (
+              <div className="rounded-lg border border-[#ccfbf1] bg-[#f0fdfa] p-4">
+                <p className="text-sm font-bold text-[#0f766e]">Resumo usado pela IA</p>
+                <h3 className="mt-2 font-bold text-[#134e4a]">{selectedProperty.title}</h3>
+                <p className="mt-1 text-sm text-[#64748b]">
+                  {selectedProperty.city} - {selectedProperty.neighborhood} | {selectedProperty.bedrooms} quartos | {selectedProperty.area}m²
+                </p>
+              </div>
+            )}
+
+            <button
+              onClick={generateAd}
               disabled={isGenerating || !selectedPropId}
-              className="w-full bg-slate-900 hover:bg-slate-800 text-white p-4 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg transition-transform active:scale-95 disabled:opacity-50"
+              className="focus-ring inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#134e4a] p-4 font-bold text-white shadow-sm hover:bg-[#0f766e] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              <Sparkles className="w-5 h-5 text-yellow-400" />
-              {isGenerating ? "Criando magia..." : "Gerar Textos de Alta Conversão"}
+              <Sparkles className="h-5 w-5 text-[#facc15]" />
+              {isGenerating ? "Gerando..." : "Gerar copy de alta conversao"}
             </button>
           </div>
-        </div>
+        </section>
 
-        <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex flex-col">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-bold text-slate-900">Pré-visualização da Copy</h3>
+        <section className="flex min-h-[560px] flex-col rounded-lg border border-[#99f6e4] bg-white p-6 shadow-sm">
+          <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+            <div>
+              <h2 className="text-xl font-bold text-[#134e4a]">Preview da copy</h2>
+              <p className="mt-1 text-sm text-[#64748b]">Texto pronto para revisar, ajustar e publicar.</p>
+            </div>
             {generatedAd && (
-              <button onClick={copyToClipboard} className="text-sm font-bold text-blue-600 bg-blue-100 px-3 py-1.5 rounded-lg flex items-center gap-1 hover:bg-blue-200 transition-colors">
-                {copied ? <><Check className="w-4 h-4"/> Copiado!</> : <><Copy className="w-4 h-4"/> Copiar</>}
+              <button onClick={copyToClipboard} className="focus-ring inline-flex items-center justify-center gap-2 rounded-lg border border-[#99f6e4] px-4 py-3 text-sm font-bold text-[#0f766e] hover:bg-[#ccfbf1]">
+                {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                {copied ? "Copiado" : "Copiar"}
               </button>
             )}
           </div>
-          
-          <div className="flex-1 bg-white border border-slate-200 rounded-xl p-5 shadow-inner overflow-y-auto whitespace-pre-wrap font-medium text-slate-700 leading-relaxed text-sm">
+
+          <div className="flex-1 rounded-lg border border-[#ccfbf1] bg-[#f8fafc] p-5 text-sm font-semibold leading-7 text-[#475569] shadow-inner">
             {generatedAd ? (
-              generatedAd
+              <pre className="whitespace-pre-wrap font-sans">{generatedAd}</pre>
             ) : (
-              <span className="text-slate-400 italic">O texto gerado pela IA aparecerá aqui.</span>
+              <div className="flex h-full min-h-80 items-center justify-center text-center text-[#64748b]">
+                <div>
+                  <Sparkles className="mx-auto mb-4 h-10 w-10 text-[#0f766e]" />
+                  <p className="font-bold">A copy gerada aparecera aqui.</p>
+                  <p className="mt-2 max-w-md text-sm">Use o cadastro do imovel para criar uma primeira versao comercial mais rapido.</p>
+                </div>
+              </div>
             )}
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );
