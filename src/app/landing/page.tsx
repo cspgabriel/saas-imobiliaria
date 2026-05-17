@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import {
   ArrowRight,
   Bot,
@@ -33,6 +33,7 @@ import {
   UsersRound,
   Wallet,
 } from "lucide-react";
+import { useAuth } from "../../lib/AuthContext";
 
 const painPoints = [
   {
@@ -359,6 +360,8 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 }
 
 export function Landing() {
+  const { login } = useAuth();
+  const [, setLocation] = useLocation();
   return (
     <div className="min-h-screen bg-[#f0f4ff] text-[#0f2447]">
       <a href="#conteudo" className="focus-ring sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[80] focus:bg-white focus:px-4 focus:py-3 focus:text-[#0f2447] focus:shadow-lg">
@@ -383,13 +386,13 @@ export function Landing() {
           </div>
 
           <div className="flex items-center gap-2">
-            <Link href="/" className="focus-ring hidden rounded-lg px-4 py-3 text-sm font-bold text-[#0f2447] hover:bg-[#dbeafe] sm:inline-flex">
+            <Link href="/site/demo" className="focus-ring hidden rounded-lg px-4 py-3 text-sm font-bold text-[#0f2447] hover:bg-[#dbeafe] sm:inline-flex">
               Ver demo
             </Link>
-            <Link href="/admin" className="focus-ring inline-flex items-center gap-2 rounded-lg bg-[#1d4ed8] px-4 py-3 text-sm font-bold text-white shadow-sm hover:bg-[#1e40af]">
+            <button onClick={() => login().then(() => setLocation("/admin"))} className="focus-ring inline-flex items-center gap-2 rounded-lg bg-[#1d4ed8] px-4 py-3 text-sm font-bold text-white shadow-sm hover:bg-[#1e40af]">
               Testar grátis
               <ArrowRight className="h-4 w-4" />
-            </Link>
+            </button>
           </div>
         </div>
       </nav>
@@ -412,11 +415,11 @@ export function Landing() {
                 Site profissional, CRM inteligente, marketing com IA e relatórios em tempo real. Tudo integrado, multi-usuário, pronto pra escalar do corretor autônomo à rede com filial.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <Link href="/admin" className="focus-ring inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-4 text-base font-bold text-[#0f2447] shadow-lg hover:bg-[#dbeafe]">
+                <button onClick={() => login().then(() => setLocation("/admin"))} className="focus-ring inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-4 text-base font-bold text-[#0f2447] shadow-lg hover:bg-[#dbeafe]">
                   Testar 14 dias grátis
                   <ArrowRight className="h-5 w-5" />
-                </Link>
-                <Link href="/" className="focus-ring inline-flex items-center justify-center gap-2 rounded-lg border border-white/30 bg-white/5 px-6 py-4 text-base font-bold text-white backdrop-blur hover:bg-white/10">
+                </button>
+                <Link href="/site/demo" className="focus-ring inline-flex items-center justify-center gap-2 rounded-lg border border-white/30 bg-white/5 px-6 py-4 text-base font-bold text-white backdrop-blur hover:bg-white/10">
                   <PlayCircle className="h-5 w-5" />
                   Ver demonstração
                 </Link>
@@ -537,10 +540,10 @@ export function Landing() {
                         </li>
                       ))}
                     </ul>
-                    <Link href="/admin" className="focus-ring mt-7 inline-flex items-center gap-2 rounded-lg bg-[#1d4ed8] px-5 py-3 text-sm font-bold text-white hover:bg-[#1e40af]">
+                    <button onClick={() => login().then(() => setLocation("/admin"))} className="focus-ring mt-7 inline-flex items-center gap-2 rounded-lg bg-[#1d4ed8] px-5 py-3 text-sm font-bold text-white hover:bg-[#1e40af]">
                       Quero usar agora
                       <ArrowRight className="h-4 w-4" />
-                    </Link>
+                    </button>
                   </div>
                   <div>{f.mock}</div>
                 </div>
@@ -739,11 +742,11 @@ export function Landing() {
               Comece hoje, sem cartão de crédito, sem contrato de permanência. Em 5 minutos sua imobiliária está online com tudo que precisa pra vender mais.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link href="/admin" className="focus-ring inline-flex items-center justify-center gap-2 rounded-lg bg-white px-7 py-4 text-base font-bold text-[#0f2447] shadow-lg hover:bg-[#dbeafe]">
+              <button onClick={() => login().then(() => setLocation("/admin"))} className="focus-ring inline-flex items-center justify-center gap-2 rounded-lg bg-white px-7 py-4 text-base font-bold text-[#0f2447] shadow-lg hover:bg-[#dbeafe]">
                 Testar 14 dias grátis
                 <ArrowRight className="h-5 w-5" />
-              </Link>
-              <Link href="/" className="focus-ring inline-flex items-center justify-center gap-2 rounded-lg border border-white/30 px-7 py-4 text-base font-bold text-white hover:bg-white/10">
+              </button>
+              <Link href="/site/demo" className="focus-ring inline-flex items-center justify-center gap-2 rounded-lg border border-white/30 px-7 py-4 text-base font-bold text-white hover:bg-white/10">
                 Ver site modelo
                 <PanelTop className="h-5 w-5" />
               </Link>
@@ -771,7 +774,7 @@ export function Landing() {
               <li><a href="#recursos" className="hover:text-white">Recursos</a></li>
               <li><a href="#ia" className="hover:text-white">IA</a></li>
               <li><a href="#planos" className="hover:text-white">Planos</a></li>
-              <li><Link href="/" className="hover:text-white">Site modelo</Link></li>
+              <li><Link href="/site/demo" className="hover:text-white">Site modelo</Link></li>
             </ul>
           </div>
           <div>
@@ -779,7 +782,7 @@ export function Landing() {
             <ul className="mt-3 space-y-2 text-sm text-[#dbeafe]">
               <li><a href="#depoimentos" className="hover:text-white">Depoimentos</a></li>
               <li><a href="#faq" className="hover:text-white">FAQ</a></li>
-              <li><Link href="/admin" className="hover:text-white">Sistema</Link></li>
+              <li><button onClick={() => login().then(() => setLocation("/admin"))} className="hover:text-white">Sistema</button></li>
             </ul>
           </div>
         </div>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Agency, getAgencyBySlug } from "./agency";
+import { Agency, getAgencyByHost, getAgencyBySlug } from "./agency";
 import { useAgency } from "./AgencyContext";
 
 export function useResolvedAgency(slug?: string) {
@@ -10,8 +10,9 @@ export function useResolvedAgency(slug?: string) {
   useEffect(() => {
     if (!slug) return;
     setSlugLoading(true);
-    getAgencyBySlug(slug).then((ag) => {
-      setSlugAgency(ag);
+    getAgencyBySlug(slug).then(async (ag) => {
+      const fallbackAgency = slug === "demo" && !ag ? await getAgencyByHost(window.location.hostname) : null;
+      setSlugAgency(ag ?? fallbackAgency);
       setSlugLoading(false);
     });
   }, [slug]);
