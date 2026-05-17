@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Agency, getAgencyById } from "./agency";
 import { useAuth } from "./AuthContext";
 
+const DEMO_AGENCY_ID = "demo";
+
 export function useAdminAgency() {
   const { profile, loading: authLoading } = useAuth();
   const [agency, setAgency] = useState<Agency | null>(null);
@@ -16,9 +18,9 @@ export function useAdminAgency() {
     const loadAgency = async () => {
       try {
         if (!hasProfile) {
-          const demoAgency = await getAgencyById("demo");
+          const demoAgency = await getAgencyById(DEMO_AGENCY_ID);
           if (!demoAgency) {
-            console.warn('Agência demo "demo" não encontrada para acesso admin sem autenticação.');
+            console.warn(`Agência demo "${DEMO_AGENCY_ID}" não encontrada para acesso admin sem autenticação.`);
             if (!cancelled) {
               setAgency(null);
               setLoading(false);
@@ -44,7 +46,7 @@ export function useAdminAgency() {
           setLoading(false);
         }
       } catch (err) {
-        const loadContext = hasProfile ? `auth agencyId=${agencyId ?? "none"}` : "demo unauthenticated";
+        const loadContext = hasProfile ? `auth agencyId=${agencyId ?? "none"}` : `${DEMO_AGENCY_ID} unauthenticated`;
         console.error(`Falha ao carregar agência admin (${loadContext}).`, err);
         if (!cancelled) {
           setAgency(null);
