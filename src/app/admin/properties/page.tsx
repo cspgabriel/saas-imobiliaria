@@ -3,7 +3,7 @@ import { Building2, Edit, Link as LinkIcon, Plus, Search, Trash2, X } from "luci
 import { cn } from "../../../lib/utils";
 import { collection, deleteDoc, doc, onSnapshot, query, setDoc, Timestamp } from "firebase/firestore";
 import { db, handleFirestoreError, OperationType } from "../../../lib/firebase";
-import { useAgency } from "../../../lib/AgencyContext";
+import { useAdminAgency } from "../../../lib/useAdminAgency";
 
 type Property = {
   id: string;
@@ -22,7 +22,7 @@ type Property = {
 };
 
 export function AdminProperties() {
-  const { agency, loading: agencyLoading } = useAgency();
+  const { agency, loading: agencyLoading } = useAdminAgency();
   const [properties, setProperties] = useState<Property[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);

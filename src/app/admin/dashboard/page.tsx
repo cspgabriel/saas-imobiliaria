@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ArrowUpRight, Building2, CheckCircle2, Clock3, Target, Users } from "lucide-react";
 import { Link } from "wouter";
-import { useAgency } from "../../../lib/AgencyContext";
+import { useAdminAgency } from "../../../lib/useAdminAgency";
 import { db, handleFirestoreError, OperationType } from "../../../lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
 
@@ -15,7 +15,7 @@ type Stats = {
 };
 
 export function AdminDashboard() {
-  const { agency, loading } = useAgency();
+  const { agency, loading } = useAdminAgency();
   const [stats, setStats] = useState<Stats | null>(null);
 
   useEffect(() => {

@@ -12,17 +12,23 @@ import { AdminProperties } from "./app/admin/properties/page";
 import { CRM } from "./app/admin/crm/page";
 import { AdminReports } from "./app/admin/reports/page";
 import { AdminMarketing } from "./app/admin/marketing/page";
-import { SaasLanding } from "./app/saas/page";
+import { Landing } from "./app/landing/page";
+import { Onboarding } from "./app/onboarding/page";
+import { RootRoute } from "./app/RootRoute";
 
 export default function App() {
   return (
     <Switch>
-      <Route path="/saas" component={SaasLanding} />
-      <Route path="/" component={Home} />
+      <Route path="/landing" component={Landing} />
+      <Route path="/onboarding" component={Onboarding} />
+      <Route path="/site/:slug" component={Home} />
+      <Route path="/site/:slug/imovel/:id">
+        {(params) => <PropertyDetail id={params.id} slug={params.slug} />}
+      </Route>
       <Route path="/imovel/:id">
         {(params) => <PropertyDetail id={params.id} />}
       </Route>
-      
+
       <Route path="/admin" nest>
         <AdminLayout>
           <Switch>
@@ -34,6 +40,8 @@ export default function App() {
           </Switch>
         </AdminLayout>
       </Route>
+
+      <Route path="/" component={RootRoute} />
     </Switch>
   );
 }

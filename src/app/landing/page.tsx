@@ -358,7 +358,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
   );
 }
 
-export function SaasLanding() {
+export function Landing() {
   return (
     <div className="min-h-screen bg-[#f0f4ff] text-[#0f2447]">
       <a href="#conteudo" className="focus-ring sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[80] focus:bg-white focus:px-4 focus:py-3 focus:text-[#0f2447] focus:shadow-lg">
@@ -367,7 +367,7 @@ export function SaasLanding() {
 
       <nav className="fixed left-0 right-0 top-0 z-50 border-b border-[#bfdbfe]/60 bg-white/90 backdrop-blur">
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6">
-          <Link href="/saas" className="focus-ring flex items-center gap-3">
+          <Link href="/landing" className="focus-ring flex items-center gap-3">
             <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#0f2447] text-white shadow-sm">
               <Building2 className="h-5 w-5" />
             </span>
@@ -755,7 +755,7 @@ export function SaasLanding() {
       <footer className="border-t border-[#bfdbfe] bg-[#0f2447] px-4 py-12 text-white sm:px-6">
         <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-4">
           <div className="md:col-span-2">
-            <Link href="/saas" className="focus-ring inline-flex items-center gap-3">
+            <Link href="/landing" className="focus-ring inline-flex items-center gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#1d4ed8] text-white">
                 <Building2 className="h-5 w-5" />
               </span>

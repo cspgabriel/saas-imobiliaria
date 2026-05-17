@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAgency } from "../../../lib/AgencyContext";
+import { useAdminAgency } from "../../../lib/useAdminAgency";
 import { db, handleFirestoreError, OperationType } from "../../../lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
@@ -7,7 +7,7 @@ import { Eye, Home, TrendingUp, Users } from "lucide-react";
 import { useAuth } from "../../../lib/AuthContext";
 
 export function AdminReports() {
-  const { agency, loading } = useAgency();
+  const { agency, loading } = useAdminAgency();
   const { profile } = useAuth();
   const [stats, setStats] = useState({
     totalLeads: 0,

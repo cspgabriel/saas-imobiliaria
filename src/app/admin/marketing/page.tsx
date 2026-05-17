@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useAgency } from "../../../lib/AgencyContext";
+import { useAdminAgency } from "../../../lib/useAdminAgency";
 import { db, handleFirestoreError, OperationType } from "../../../lib/firebase";
 import { collection, getDocs, query } from "firebase/firestore";
 import { Check, Copy, Facebook, Instagram, Search, Sparkles } from "lucide-react";
@@ -8,7 +8,7 @@ import { cn } from "../../../lib/utils";
 type Platform = "FACEBOOK" | "INSTAGRAM" | "GOOGLE";
 
 export function AdminMarketing() {
-  const { agency, loading } = useAgency();
+  const { agency, loading } = useAdminAgency();
   const [properties, setProperties] = useState<any[]>([]);
   const [selectedPropId, setSelectedPropId] = useState<string>("");
   const [adPlatform, setAdPlatform] = useState<Platform>("FACEBOOK");
