@@ -29,15 +29,29 @@ export default function App() {
         {(params) => <PropertyDetail id={params.id} />}
       </Route>
 
-      <Route path="/admin" nest>
+      <Route path="/admin/properties">
         <AdminLayout>
-          <Switch>
-            <Route path="/" component={AdminDashboard} />
-            <Route path="/properties" component={AdminProperties} />
-            <Route path="/crm" component={CRM} />
-            <Route path="/reports" component={AdminReports} />
-            <Route path="/marketing" component={AdminMarketing} />
-          </Switch>
+          <AdminProperties />
+        </AdminLayout>
+      </Route>
+      <Route path="/admin/crm">
+        <AdminLayout>
+          <CRM />
+        </AdminLayout>
+      </Route>
+      <Route path="/admin/reports">
+        <AdminLayout>
+          <AdminReports />
+        </AdminLayout>
+      </Route>
+      <Route path="/admin/marketing">
+        <AdminLayout>
+          <AdminMarketing />
+        </AdminLayout>
+      </Route>
+      <Route path="/admin">
+        <AdminLayout>
+          <AdminDashboard />
         </AdminLayout>
       </Route>
 
