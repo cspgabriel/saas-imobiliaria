@@ -24,9 +24,14 @@ export default defineConfig(({mode}) => {
         }
       })
     ].filter(Boolean),
-    define: {
-      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-    },
+    // SECURITY: GEMINI_API_KEY removed from client bundle. It was being inlined into JS
+    // shipped to the browser (anyone could exfiltrate the key from DevTools).
+    // Calls must go through the /api/generate-ad server route which reads the key
+    // server-side from process.env.GEMINI_API_KEY.
+    // TODO: ensure all client code calls /api/generate-ad instead of using process.env.GEMINI_API_KEY directly.
+    // define: {
+    //   'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
+    // },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
