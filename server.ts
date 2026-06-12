@@ -2,6 +2,7 @@ import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
+import { prisma } from "./src/lib/prisma";
 
 // SECURITY: minimal auth middleware skeleton. Verifies a Firebase ID token sent in
 // the Authorization: Bearer <token> header. TODO: wire up firebase-admin SDK and
@@ -37,6 +38,155 @@ async function startServer() {
   // API Routes
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
+  });
+
+  // Agency MySQL CRUD
+  app.get("/api/agencies/subdomain/:slug", async (req, res) => {
+    try {
+      const { slug } = req.params;
+      const agency = await prisma.agency.findUnique({
+        where: { subdomain: slug },
+      });
+      if (!agency) return res.status(404).json({ error: "Agency not found" });
+      res.json(agency);
+    } catch (error: any) {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/agencies/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const agency = await prisma.agency.findUnique({
+        where: { id },
+      });
+      if (!agency) return res.status(404).json({ error: "Agency not found" });
+      res.json(agency);
+    } catch (error: any) {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/agencies", async (req, res) => {
+    try {
+      const { name, subdomain, ownerId, plan } = req.body;
+      const agency = await prisma.agency.upsert({
+        where: { subdomain },
+        update: { name, ownerId, plan: plan || "trial" },
+        create: { name, subdomain, ownerId, plan: plan || "trial" },
+      });
+      res.json(agency);
+    } catch (error: any) {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Property MySQL CRUD
+  app.get("/api/properties", async (req, res) => {
+    try {
+      const { agencyId } = req.query;
+      if (!agencyId) return res.status(400).json({ error: "agencyId is required" });
+      const properties = await prisma.property.findMany({
+        where: { agencyId: String(agencyId) },
+        orderBy: { createdAt: "desc" },
+      });
+      res.json(properties);
+    } catch (error: any) {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/properties/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const property = await prisma.property.findUnique({
+        where: { id },
+      });
+      if (!property) return res.status(404).json({ error: "Property not found" });
+      res.json(property);
+    } catch (error: any) {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/properties", async (req, res) => {
+    try {
+      const {
+        id,
+        title,
+        description,
+        price,
+        type,
+        status,
+        city,
+        neighborhood,
+        bedrooms,
+        bathrooms,
+        area,
+        imageUrl,
+        agencyId,
+      } = req.body;
+      if (!agencyId) return res.status(400).json({ error: "agencyId is required" });
+
+      if (id) {
+        const property = await prisma.property.update({
+          where: { id },
+          data: {
+            title,
+            description,
+            price: Number(price),
+            type,
+            status,
+            city,
+            neighborhood,
+            bedrooms: Number(bedrooms),
+            bathrooms: Number(bathrooms),
+            area: Number(area),
+            imageUrl,
+          },
+        });
+        return res.json(property);
+      } else {
+        const property = await prisma.property.create({
+          data: {
+            title,
+            description,
+            price: Number(price),
+            type,
+            status,
+            city,
+            neighborhood,
+            bedrooms: Number(bedrooms),
+            bathrooms: Number(bathrooms),
+            area: Number(area),
+            imageUrl: imageUrl || "",
+            agencyId,
+          },
+        });
+        return res.json(property);
+      }
+    } catch (error: any) {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/properties/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      await prisma.property.delete({
+        where: { id },
+      });
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    }
   });
 
   app.post("/api/generate-ad", requireAuth, async (req, res) => {

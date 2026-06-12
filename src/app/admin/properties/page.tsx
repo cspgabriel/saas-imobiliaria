@@ -41,26 +41,20 @@ export function AdminProperties() {
   const [area, setArea] = useState("0");
   const [imageUrl, setImageUrl] = useState("");
 
-  useEffect(() => {
+  const fetchProperties = async () => {
     if (!agency) return;
-    const q = query(collection(db, "agencies", agency.id, "properties"));
-    const unsub = onSnapshot(
-      q,
-      (snap) => {
-        setProperties(
-          snap.docs.map((item) => {
-            const data = item.data();
-            return {
-              id: item.id,
-              ...data,
-              createdAt: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-            } as Property;
-          })
-        );
-      },
-      (error) => handleFirestoreError(error, OperationType.LIST, `agencies/${agency.id}/properties`)
-    );
-    return unsub;
+    try {
+      const res = await fetch(`/api/properties?agencyId=${agency.id}`);
+      if (res.ok) {
+        setProperties(await res.json());
+      }
+    } catch (error) {
+      console.error("Erro ao carregar imóveis:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProperties();
   }, [agency]);
 
   const resetForm = () => {
@@ -99,6 +93,7 @@ export function AdminProperties() {
     if (!agency) return;
 
     const payload = {
+      id: editingId || undefined,
       title,
       description,
       price: Number(price),
@@ -110,20 +105,22 @@ export function AdminProperties() {
       bathrooms: Number(bathrooms),
       area: Number(area),
       imageUrl,
-      updatedAt: Timestamp.now(),
+      agencyId: agency.id,
     };
 
     try {
-      if (editingId) {
-        await setDoc(doc(db, "agencies", agency.id, "properties", editingId), payload, { merge: true });
-      } else {
-        const newDocRef = doc(collection(db, "agencies", agency.id, "properties"));
-        await setDoc(newDocRef, { ...payload, createdAt: Timestamp.now(), views: 0 });
+      const res = await fetch("/api/properties", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        setIsModalOpen(false);
+        resetForm();
+        fetchProperties();
       }
-      setIsModalOpen(false);
-      resetForm();
     } catch (error) {
-      handleFirestoreError(error, OperationType.WRITE, `agencies/${agency.id}/properties`);
+      console.error("Erro ao salvar imóvel:", error);
     }
   };
 
@@ -131,9 +128,14 @@ export function AdminProperties() {
     if (!agency) return;
     if (!confirm("Tem certeza que deseja excluir este imovel?")) return;
     try {
-      await deleteDoc(doc(db, "agencies", agency.id, "properties", id));
+      const res = await fetch(`/api/properties/${id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        fetchProperties();
+      }
     } catch (err) {
-      handleFirestoreError(err, OperationType.DELETE, `agencies/${agency.id}/properties`);
+      console.error("Erro ao excluir imóvel:", err);
     }
   };
 

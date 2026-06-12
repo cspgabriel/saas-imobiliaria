@@ -1,0 +1,40 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Agency {
+  id           String     @id @default(uuid())
+  name         String
+  subdomain    String     @unique
+  customDomain String?    @unique
+  plan         String     @default("trial")
+  ownerId      String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  properties   Property[]
+}
+
+model Property {
+  id          String   @id @default(uuid())
+  title       String
+  description String   @db.Text
+  price       Float
+  type        String   // VENDA ou LOCACAO
+  status      String   // DISPONIVEL, RESERVADO, VENDIDO
+  city        String
+  neighborhood String
+  bedrooms    Int
+  bathrooms   Int
+  area        Float
+  imageUrl    String
+  views       Int      @default(0)
+  agencyId    String
+  agency      Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
