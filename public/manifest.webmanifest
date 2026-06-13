@@ -1,0 +1,16 @@
+{
+  "name": "Imobi SaaS — Gestão Imobiliária",
+  "short_name": "Imobi SaaS",
+  "description": "Plataforma completa para imobiliárias: gestão de imóveis, CRM, site próprio e relatórios.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1E3A8A",
+  "lang": "pt-BR",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

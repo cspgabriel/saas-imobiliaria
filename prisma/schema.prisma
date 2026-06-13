@@ -17,6 +17,7 @@ model Agency {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
   properties   Property[]
+  @@map("imob_Agency")
 }
 
 model Property {
@@ -37,4 +38,5 @@ model Property {
   agency      Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  @@map("imob_Property")
 }

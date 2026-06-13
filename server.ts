@@ -1,8 +1,7 @@
 import express from "express";
 import path from "path";
-import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
-import { prisma } from "./src/lib/prisma";
+import { prisma } from "./src/lib/prisma.js";
 
 // SECURITY: minimal auth middleware skeleton. Verifies a Firebase ID token sent in
 // the Authorization: Bearer <token> header. TODO: wire up firebase-admin SDK and
@@ -223,7 +222,8 @@ async function startServer() {
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({
+    const { createServer: createViteServer } = await import("vite");
+        const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
     });
