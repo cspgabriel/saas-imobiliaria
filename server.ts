@@ -28,8 +28,9 @@ async function requireAuth(req: express.Request, res: express.Response, next: ex
   }
 }
 
+export const app = express();
+
 async function startServer() {
-  const app = express();
   const PORT = 3000;
 
   app.use(express.json({ limit: "32kb" })); // SECURITY: bound request size
@@ -220,10 +221,14 @@ async function startServer() {
     }
   });
 
+  // On Vercel, routes above are registered on the exported `app`; the dev
+  // server (vite middleware + listen) must NOT run.
+  if (process.env.VERCEL) return;
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const { createServer: createViteServer } = await import("vite");
-        const vite = await createViteServer({
+    const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
     });
